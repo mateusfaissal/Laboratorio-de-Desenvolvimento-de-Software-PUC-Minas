@@ -12,6 +12,10 @@ public class Secretaria extends User {
     super(nome, email, senha);
   }
 
+  public void fecharPeriodoMatricula() {
+    // todo
+  }
+
   @Override
   public String toString() {
     return "Secretaria [id=" + getId() + ", nome=" + getNome() + ", email=" + getEmail() + "]";

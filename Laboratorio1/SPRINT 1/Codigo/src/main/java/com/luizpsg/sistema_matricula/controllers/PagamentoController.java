@@ -21,11 +21,11 @@ public class PagamentoController {
   private SistemaDePagamentoImpl sistemaDePagamento;
 
   @PostMapping("/realizar")
-  public String realizarPagamento(@RequestParam Long alunoId, @RequestParam double valor) {
+  public String enviarCobranca(@RequestParam Long alunoId, @RequestParam double valor) {
     Aluno aluno = alunoRepository.findById(alunoId)
         .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
-    sistemaDePagamento.realizarPagamento(aluno, valor);
+    sistemaDePagamento.enviarCobranca(aluno, valor);
     return "Pagamento realizado e e-mail enviado para o aluno " + aluno.getNome();
   }
 

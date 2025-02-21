@@ -123,6 +123,16 @@ public class Disciplina {
     alunos.remove(aluno);
   }
 
+  public boolean verificarMinimoAlunos() {
+    // todo
+    return true;
+  }
+
+  public boolean verificarCapacidade() {
+    // todo
+    return true;
+  }
+
   // toString
   @Override
   public String toString() {

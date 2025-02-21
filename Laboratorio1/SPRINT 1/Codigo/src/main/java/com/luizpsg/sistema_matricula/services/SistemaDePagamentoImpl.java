@@ -12,15 +12,13 @@ public class SistemaDePagamentoImpl implements SistemaDePagamento {
   private EmailService emailService;
 
   @Override
-  public void realizarPagamento(Aluno aluno, double valor) {
-    // Lógica do pagamento (exemplo simples)
-    // Pode integrar com APIs de pagamento, verificar saldo, etc.
+  public void enviarCobranca(Aluno aluno, double valor) {
     System.out.println("boleto de R$" + valor + " enviado para o aluno: " + aluno.getNome());
 
-    // Ao final, enviamos um e-mail de notificação
     String assunto = "Boleto de Matrícula";
     String mensagem = "Olá " + aluno.getNome() + ", seu boleto de R$" + valor + " foi gerado!";
+    String emailAluno = aluno.getEmail();
 
-    emailService.enviarEmail(aluno.getEmail(), assunto, mensagem);
+    emailService.enviarEmail(emailAluno, assunto, mensagem);
   }
 }

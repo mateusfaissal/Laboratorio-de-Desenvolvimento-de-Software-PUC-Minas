@@ -31,6 +31,10 @@ public class Professor extends User {
     disciplinasLecionadas.remove(disciplina);
   }
 
+  public List<Aluno> visualizarAlunosMatriculados(Disciplina disciplina) {
+    return null;
+  }
+
   @Override
   public String toString() {
     return "Professor [disciplinasLecionadas=" + disciplinasLecionadas + "]";

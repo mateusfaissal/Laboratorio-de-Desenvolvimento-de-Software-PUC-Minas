@@ -19,7 +19,7 @@ public class Aluno extends User {
     super(nome, email, senha);
   }
 
-  public List<Disciplina> getDisciplinas() {
+  public List<Disciplina> consultarDisciplinas() {
     return disciplinas;
   }
 
