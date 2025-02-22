@@ -11,7 +11,7 @@ Bem-vindo ao repositório que reúne os trabalhos desenvolvidos na disciplina de
 
 - **Laboratório 01**: Sistema de Matrículas
 
-Em caso de dúvidas ou sugestões, entre em contato com os autores:
+## Em caso de dúvidas ou sugestões, entre em contato com os autores:
 
 - **Luiz Paulo Saud Gonçalves**
 - **Mateus Faisal**
