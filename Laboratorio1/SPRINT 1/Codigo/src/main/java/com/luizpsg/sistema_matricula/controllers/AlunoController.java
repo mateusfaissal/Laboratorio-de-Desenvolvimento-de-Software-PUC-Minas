@@ -30,9 +30,20 @@ public class AlunoController {
     return alunoRepository.findAll();
   }
 
+  @GetMapping("/disciplinas")
+  public List<Disciplina> consultarDisciplinas(@RequestParam Long alunoId) {
+    Aluno aluno = alunoRepository.findById(alunoId).get();
+    return aluno.consultarDisciplinas();
+  }
+
   @PostMapping
   public Aluno cadastrarAluno(@RequestBody Aluno aluno) {
     return alunoRepository.save(aluno);
+  }
+
+  @PostMapping("/lote")
+  public List<Aluno> cadastrarAlunos(@RequestBody List<Aluno> alunos) {
+    return alunoRepository.saveAll(alunos);
   }
 
   @PostMapping("/matricular")

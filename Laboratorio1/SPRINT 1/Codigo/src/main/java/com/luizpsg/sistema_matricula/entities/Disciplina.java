@@ -108,9 +108,9 @@ public class Disciplina {
   }
 
   public void addAluno(Aluno aluno) {
-    if (alunos.size() >= maxAlunos) {
+    if (verificarCapacidade()) {
       throw new RuntimeException("Limite de alunos atingido");
-    } else if (alunos.stream().anyMatch(a -> a.getId().equals(aluno.getId()))) {
+    } else if (verificarSeAlunoJaEstaMatriculado(aluno)) {
       throw new RuntimeException("Aluno já matriculado");
     } else if (!ehAtiva) {
       throw new RuntimeException("Disciplina inativa");
@@ -124,13 +124,24 @@ public class Disciplina {
   }
 
   public boolean verificarMinimoAlunos() {
-    // todo
+    if (alunos.size() < 3) {
+      return false;
+    }
     return true;
   }
 
   public boolean verificarCapacidade() {
-    // todo
+    if (alunos.size() >= maxAlunos) {
+      return false;
+    }
     return true;
+  }
+
+  public boolean verificarSeAlunoJaEstaMatriculado(Aluno aluno) {
+    if (alunos.stream().anyMatch(a -> a.getId().equals(aluno.getId()))) {
+      return true;
+    }
+    return false;
   }
 
   // toString

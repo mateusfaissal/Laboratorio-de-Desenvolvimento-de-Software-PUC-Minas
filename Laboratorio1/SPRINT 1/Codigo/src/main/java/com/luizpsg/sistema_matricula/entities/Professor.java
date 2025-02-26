@@ -32,7 +32,7 @@ public class Professor extends User {
   }
 
   public List<Aluno> visualizarAlunosMatriculados(Disciplina disciplina) {
-    return null;
+    return disciplina.getAlunos();
   }
 
   @Override
