@@ -30,8 +30,28 @@ public class ProfessorController {
     return professorRepository.findAll();
   }
 
+  @GetMapping("/buscar-professor")
+  public Professor buscarProfessor(@RequestParam Long id) {
+    return professorRepository.findById(id).get();
+  }
+
   @PostMapping
   public Professor cadastrarProfessor(@RequestBody Professor professor) {
+    return professorRepository.save(professor);
+  }
+
+  @PostMapping("/lote")
+  public List<Professor> cadastrarProfessores(@RequestBody List<Professor> professores) {
+    return professorRepository.saveAll(professores);
+  }
+
+  @PostMapping("/remover-disciplina")
+  public Professor removerDisciplina(@RequestParam Long professorId, @RequestParam Long disciplinaId) {
+    Professor professor = professorRepository.findById(professorId).get();
+    Disciplina disciplina = disciplinaRepository.findById(disciplinaId).get();
+    professor.removeDisciplina(disciplina);
+    disciplina.setProfessor(null);
+    disciplinaRepository.save(disciplina);
     return professorRepository.save(professor);
   }
 

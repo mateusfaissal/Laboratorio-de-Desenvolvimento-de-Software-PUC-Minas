@@ -35,6 +35,11 @@ public class CursoController {
     return cursoRepository.save(curso);
   }
 
+  @PostMapping("/lote")
+  public List<Curso> cadastrarCursos(@RequestBody List<Curso> cursos) {
+    return cursoRepository.saveAll(cursos);
+  }
+
   @PostMapping("/add-disciplina")
   public Curso addDisciplina(@RequestParam Long cursoId, @RequestParam Long disciplinaId) {
     Curso curso = cursoRepository.findById(cursoId).get();

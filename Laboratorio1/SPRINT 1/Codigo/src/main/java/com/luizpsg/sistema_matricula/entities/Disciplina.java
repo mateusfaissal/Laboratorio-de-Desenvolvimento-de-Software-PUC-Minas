@@ -108,7 +108,7 @@ public class Disciplina {
   }
 
   public void addAluno(Aluno aluno) {
-    if (verificarCapacidade()) {
+    if (!verificarCapacidade()) {
       throw new RuntimeException("Limite de alunos atingido");
     } else if (verificarSeAlunoJaEstaMatriculado(aluno)) {
       throw new RuntimeException("Aluno já matriculado");

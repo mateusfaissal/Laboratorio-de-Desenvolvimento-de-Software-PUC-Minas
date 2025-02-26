@@ -54,4 +54,20 @@ public class AlunoController {
     return alunoRepository.save(aluno);
   }
 
+  @PostMapping("/matricular/lote")
+  public List<Aluno> matricularAlunos(@RequestParam Long disciplinaId, @RequestBody List<Long> alunosIds) {
+    Disciplina disciplina = disciplinaRepository.findById(disciplinaId).get();
+    List<Aluno> alunos = alunoRepository.findAllById(alunosIds);
+    alunos.forEach(aluno -> aluno.addDisciplina(disciplina));
+    return alunoRepository.saveAll(alunos);
+  }
+
+  @PostMapping("/desmatricular")
+  public Aluno desmatricular(@RequestParam Long alunoId, @RequestParam Long disciplinaId) {
+    Aluno aluno = alunoRepository.findById(alunoId).get();
+    Disciplina disciplina = disciplinaRepository.findById(disciplinaId).get();
+    aluno.removeDisciplina(disciplina);
+    return alunoRepository.save(aluno);
+  }
+
 }

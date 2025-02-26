@@ -34,4 +34,9 @@ public class DisciplinaController {
   public Disciplina cadastrarDisciplina(@RequestBody Disciplina disciplina) {
     return disciplinaRepository.save(disciplina);
   }
+
+  @PostMapping("/lote")
+  public List<Disciplina> cadastrarDisciplinas(@RequestBody List<Disciplina> disciplinas) {
+    return disciplinaRepository.saveAll(disciplinas);
+  }
 }

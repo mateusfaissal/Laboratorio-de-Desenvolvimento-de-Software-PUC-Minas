@@ -25,6 +25,7 @@ public class Aluno extends User {
 
   public void addDisciplina(Disciplina disciplina) {
     if (!disciplinas.contains(disciplina)) {
+      disciplina.addAluno(this);
       disciplinas.add(disciplina);
     }
   }
