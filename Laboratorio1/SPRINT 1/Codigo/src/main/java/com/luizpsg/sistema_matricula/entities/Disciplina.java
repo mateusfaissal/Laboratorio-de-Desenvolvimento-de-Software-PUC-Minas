@@ -144,6 +144,12 @@ public class Disciplina {
     return false;
   }
 
+  public void desativar() {
+    this.ehAtiva = false;
+    alunos.stream().forEach(a -> a.removeDisciplina(this));
+    this.alunos.clear();
+  }
+
   // toString
   @Override
   public String toString() {

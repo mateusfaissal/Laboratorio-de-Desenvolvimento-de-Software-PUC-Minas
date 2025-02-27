@@ -1,5 +1,8 @@
 package com.luizpsg.sistema_matricula.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Entity;
 
 @Entity
@@ -12,8 +15,15 @@ public class Secretaria extends User {
     super(nome, email, senha);
   }
 
-  public void fecharPeriodoMatricula() {
-    // todo
+  public List<Disciplina> fecharPeriodoMatricula(List<Disciplina> disciplinas) {
+    List<Disciplina> disciplinasDesativadas = new ArrayList<>();
+    for (Disciplina disciplina : disciplinas) {
+      if (disciplina.getAlunos().size() < disciplina.getMinAlunos()) {
+        disciplina.desativar();
+        disciplinasDesativadas.add(disciplina);
+      }
+    }
+    return disciplinasDesativadas;
   }
 
   @Override
