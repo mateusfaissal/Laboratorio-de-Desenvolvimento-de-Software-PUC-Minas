@@ -67,6 +67,21 @@ public class ProfessorController {
     return professorRepository.save(professor);
   }
 
+  @PostMapping("/lote")
+  public List<Professor> cadastrarProfessores(@RequestBody List<Professor> professores) {
+    return professorRepository.saveAll(professores);
+  }
+
+  @PostMapping("/remover-disciplina")
+  public Professor removerDisciplina(@RequestParam Long professorId, @RequestParam Long disciplinaId) {
+    Professor professor = professorRepository.findById(professorId).get();
+    Disciplina disciplina = disciplinaRepository.findById(disciplinaId).get();
+    professor.removeDisciplina(disciplina);
+    disciplina.setProfessor(null);
+    disciplinaRepository.save(disciplina);
+    return professorRepository.save(professor);
+  }
+
   @PostMapping("/adicionar-disciplina")
   public Professor adicionarDisciplina(@RequestParam Long professorId, @RequestParam Long disciplinaId) {
     LOGGER.info("Adicionando disciplina ID: " + disciplinaId + " ao professor ID: " + professorId);
