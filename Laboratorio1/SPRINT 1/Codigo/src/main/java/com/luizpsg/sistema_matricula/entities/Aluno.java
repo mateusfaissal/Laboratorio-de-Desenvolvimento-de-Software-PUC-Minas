@@ -3,6 +3,8 @@ package com.luizpsg.sistema_matricula.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 
@@ -10,6 +12,7 @@ import jakarta.persistence.ManyToMany;
 public class Aluno extends User {
 
   @ManyToMany
+  @JsonIgnore
   private List<Disciplina> disciplinas = new ArrayList<>();
 
   public Aluno() {
@@ -25,6 +28,7 @@ public class Aluno extends User {
 
   public void addDisciplina(Disciplina disciplina) {
     if (!disciplinas.contains(disciplina)) {
+      disciplina.addAluno(this);
       disciplinas.add(disciplina);
     }
   }

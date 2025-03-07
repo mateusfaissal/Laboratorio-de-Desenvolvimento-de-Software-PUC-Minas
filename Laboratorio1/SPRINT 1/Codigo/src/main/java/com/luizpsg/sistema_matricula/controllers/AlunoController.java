@@ -54,4 +54,12 @@ public class AlunoController {
     return alunoRepository.save(aluno);
   }
 
+  @PostMapping("/desmatricular")
+  public Aluno desmatricular(@RequestParam Long alunoId, @RequestParam Long disciplinaId) {
+    Aluno aluno = alunoRepository.findById(alunoId).get();
+    Disciplina disciplina = disciplinaRepository.findById(disciplinaId).get();
+    aluno.removeDisciplina(disciplina);
+    return alunoRepository.save(aluno);
+  }
+
 }

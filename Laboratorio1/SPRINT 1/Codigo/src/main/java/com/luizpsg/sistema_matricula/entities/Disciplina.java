@@ -3,8 +3,7 @@ package com.luizpsg.sistema_matricula.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,11 +25,10 @@ public class Disciplina {
   private Boolean ehAtiva = true;
 
   @ManyToOne
-  @JsonIgnore
+  @JsonBackReference
   private Professor professor;
 
   @ManyToMany(mappedBy = "disciplinas")
-  @JsonIgnore
   private List<Aluno> alunos = new ArrayList<>();
 
   public Disciplina() {
@@ -96,7 +94,24 @@ public class Disciplina {
   }
 
   public void setProfessor(Professor professor) {
-    this.professor = professor;
+    // Se estiver removendo o professor atual
+    if (this.professor != null && professor == null) {
+      Professor oldProfessor = this.professor;
+      this.professor = null;
+      oldProfessor.removeDisciplina(this);
+    }
+    // Se estiver mudando para outro professor
+    else if (this.professor != professor) {
+      // Remover da lista do professor anterior, se existir
+      if (this.professor != null) {
+        this.professor.removeDisciplina(this);
+      }
+      this.professor = professor;
+      // Adicionar à lista do novo professor, se existir
+      if (professor != null && !professor.getDisciplinas().contains(this)) {
+        professor.addDisciplina(this);
+      }
+    }
   }
 
   public List<Aluno> getAlunos() {
@@ -108,7 +123,7 @@ public class Disciplina {
   }
 
   public void addAluno(Aluno aluno) {
-    if (verificarCapacidade()) {
+    if (!verificarCapacidade()) {
       throw new RuntimeException("Limite de alunos atingido");
     } else if (verificarSeAlunoJaEstaMatriculado(aluno)) {
       throw new RuntimeException("Aluno já matriculado");
@@ -142,6 +157,12 @@ public class Disciplina {
       return true;
     }
     return false;
+  }
+
+  public void desativar() {
+    this.ehAtiva = false;
+    alunos.stream().forEach(a -> a.removeDisciplina(this));
+    this.alunos.clear();
   }
 
   // toString

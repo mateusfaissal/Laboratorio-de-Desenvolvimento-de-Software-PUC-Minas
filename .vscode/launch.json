@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-SistemaMatriculaApplication<sistema-matricula>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.luizpsg.sistema_matricula.SistemaMatriculaApplication",
+      "projectName": "sistema-matricula",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
