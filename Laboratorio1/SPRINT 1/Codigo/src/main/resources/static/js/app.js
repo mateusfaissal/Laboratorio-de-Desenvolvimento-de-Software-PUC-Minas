@@ -1133,7 +1133,7 @@ function displaySecretaria(secretarias) {
                       }</strong></p>
                       <div class="d-flex gap-2">
                           <button class="btn btn-success" onclick="alterarStatusMatriculas(true)">Abrir Período</button>
-                          <button class="btn btn-danger" onclick="alterarStatusMatriculas(false)">Fechar Período</button>
+                          <button class="btn btn-danger" onclick="alterarStatusMatriculas(false); enviarBoleto()">Fechar Período</button>
                       </div>
                   </div>
               </div>
@@ -1166,5 +1166,15 @@ async function alterarStatusMatriculas(status) {
     }
   } catch (error) {
     showError(`Erro ao alterar status das matrículas: ${error.message}`);
+  }
+}
+
+async function enviarBoleto() {
+  try {
+    const response = await fetch(`${API_PAGAMENTOS}/realizar`, {
+      method: "POST",
+    });
+  } catch (error) {
+    showError(`Erro ao enviar boleto: ${error.message}`);
   }
 }
