@@ -1,0 +1,103 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>540</x><y>0</y><w>210</w><h>120</h></coordinates><panel_attributes>&lt;&lt;Abstract&gt;&gt;
+Usuario
+--
+- id : int
+- username : String
+- senha : String
+--
++ autenticar(senha: String) : boolean
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>730</x><y>240</y><w>350</w><h>190</h></coordinates><panel_attributes>Agente
+--
+- nome : String
+- tipo : String 
+--
++ consultarPedidos() : List&lt;Pedido&gt;
++ modificarPedido(pedido: Pedido) : boolean
++ avaliarPedido(pedido: Pedido) : boolean
++ aprovarPedido(pedido: Pedido) : boolean
++ recusarPedido(pedido: Pedido) : boolean
++ gerenciarAutomovel(automovel: Automovel) : boolean
++ concederContrato(contrato: ContratoDeCredito) : boolean
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>960</x><y>570</y><w>210</w><h>190</h></coordinates><panel_attributes>ContratoDeCredito
+--
+- id : int
+- data : Date
+- valor : float
+- condicoes : String
+- agenteConcedente : Agente
+--
++ gerarContrato() : boolean
++ validarContrato() : boolean
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>340</x><y>880</y><w>540</w><h>190</h></coordinates><panel_attributes>Automovel
+--
+- matricula : String
+- ano : int
+- marca : String
+- modelo : String
+- placa : String
+- proprietario : Usuario
+--
++ atualizarDados(matricula: String, ano: int, marca: String, modelo: String, placa: String) : void
++ getDetalhes() : String
++ setProprietario(usuario: Usuario) : void
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>130</x><y>580</y><w>210</w><h>130</h></coordinates><panel_attributes>Rendimento
+--
+- valor : float
+- fonte : String
+--
++ getValor() : float
++ setValor(valor: float) : void
++ getFonte() : String
++ setFonte(fonte: String) : void
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>250</x><y>240</y><w>430</w><h>220</h></coordinates><panel_attributes>Cliente
+--
+- RG : String
+- CPF : String
+- nome : String
+- endereco : String
+- profissao : String
+- rendimentos : List&lt;Rendimento&gt;
+--
++ criarPedido(pedido: Pedido) : boolean
++ consultarPedidos() : List&lt;Pedido&gt;
++ modificarPedido(pedido: Pedido) : boolean
++ cancelarPedido(pedido: Pedido) : boolean
++ associarContrato(pedido: Pedido, contrato: ContratoDeCredito) : boolean
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>390</x><y>570</y><w>430</w><h>190</h></coordinates><panel_attributes>Pedido
+--
+- id : int
+- dataCriacao : Date
+- status : String
+- cliente : Cliente
+- automovel : Automovel
+- contrato : ContratoDeCredito
+--
++ atualizarStatus(status: String) : void
++ getDetalhes() : String
++ associarAutomovel(automovel: Automovel) : void
++ associarContrato(contrato: ContratoDeCredito) : void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>470</x><y>110</y><w>130</w><h>150</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>110;10;10;130</additional_attributes></element><element><id>Relation</id><coordinates><x>670</x><y>110</y><w>140</w><h>150</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;120;130</additional_attributes></element><element><id>Relation</id><coordinates><x>530</x><y>450</y><w>60</w><h>140</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=0..*
+cria &gt;</panel_attributes><additional_attributes>10;10;10;120</additional_attributes></element><element><id>Relation</id><coordinates><x>320</x><y>450</y><w>80</w><h>150</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=0..3
+possui &gt;</panel_attributes><additional_attributes>10;10;10;130</additional_attributes></element><element><id>Relation</id><coordinates><x>760</x><y>420</y><w>110</w><h>170</h></coordinates><panel_attributes>lt=-
+m1=0..1
+m2=1
+avaliado por &gt;</panel_attributes><additional_attributes>10;150;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>970</x><y>420</y><w>120</w><h>170</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=0..1
+concedido por &gt;</panel_attributes><additional_attributes>10;10;10;150</additional_attributes></element><element><id>Relation</id><coordinates><x>810</x><y>620</y><w>170</w><h>50</h></coordinates><panel_attributes>lt=-
+m1=0..1
+m2=0..1
+possui &gt;</panel_attributes><additional_attributes>10;20;150;20</additional_attributes></element><element><id>Relation</id><coordinates><x>600</x><y>750</y><w>100</w><h>150</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=1
+refere-se a &gt;</panel_attributes><additional_attributes>10;10;10;130</additional_attributes></element><element><id>Relation</id><coordinates><x>80</x><y>40</y><w>480</w><h>990</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=1
+propriedade de &gt;</panel_attributes><additional_attributes>260;960;10;960;20;10;460;10</additional_attributes></element><element><id>Relation</id><coordinates><x>640</x><y>450</y><w>110</w><h>140</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=1
+é criado por &gt;</panel_attributes><additional_attributes>10;10;10;120</additional_attributes></element></diagram>
