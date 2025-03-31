@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Novo Automóvel - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between align-items-center my-4">
+          <h2 class="text-primary">
+            <i class="bi bi-plus-circle-fill me-2"></i>Cadastrar Novo Automóvel
+          </h2>
+          <a href="/banco/automoveis" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para Automóveis
+          </a>
+        </div>
+
+        <!-- Mensagens de alerta -->
+        <div
+          th:if="${param.error}"
+          class="alert alert-danger alert-dismissible fade show mb-4"
+          role="alert"
+        >
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <strong>Erro!</strong> Ocorreu um problema ao cadastrar o automóvel.
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+              <div
+                class="card-header text-white position-relative"
+                style="background: linear-gradient(45deg, #0062cc, #0069d9)"
+              >
+                <div
+                  class="position-absolute"
+                  style="top: 15px; right: 15px; opacity: 0.2"
+                >
+                  <i class="bi bi-car-front" style="font-size: 3rem"></i>
+                </div>
+                <h5 class="card-title mb-0 py-2">
+                  <i class="bi bi-car-front-fill me-2"></i>Dados do Automóvel
+                </h5>
+              </div>
+              <div class="card-body p-4">
+                <form
+                  th:action="@{/banco/automoveis/salvar}"
+                  method="post"
+                  th:object="${automovel}"
+                  class="needs-validation"
+                  novalidate
+                >
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="marca" class="form-label">
+                        <i class="bi bi-tag text-primary me-1"></i>Marca
+                      </label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-primary text-white">
+                          <i class="bi bi-tag-fill"></i>
+                        </span>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="marca"
+                          th:field="*{marca}"
+                          placeholder="Ex: Toyota, Honda, Volkswagen"
+                          required
+                        />
+                        <div class="invalid-feedback">
+                          Por favor, informe a marca do automóvel.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="modelo" class="form-label">
+                        <i class="bi bi-car-front text-primary me-1"></i>Modelo
+                      </label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-primary text-white">
+                          <i class="bi bi-car-front-fill"></i>
+                        </span>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="modelo"
+                          th:field="*{modelo}"
+                          placeholder="Ex: Corolla, Civic, Golf"
+                          required
+                        />
+                        <div class="invalid-feedback">
+                          Por favor, informe o modelo do automóvel.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-4 mb-3">
+                      <label for="ano" class="form-label">
+                        <i class="bi bi-calendar text-primary me-1"></i>Ano
+                      </label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-primary text-white">
+                          <i class="bi bi-calendar-fill"></i>
+                        </span>
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="ano"
+                          th:field="*{ano}"
+                          min="1900"
+                          max="2099"
+                          placeholder="Ex: 2023"
+                          required
+                        />
+                        <div class="invalid-feedback">
+                          Por favor, informe um ano válido.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label for="placa" class="form-label">
+                        <i class="bi bi-sign-turn-right text-primary me-1"></i
+                        >Placa
+                      </label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-primary text-white">
+                          <i class="bi bi-sign-turn-right-fill"></i>
+                        </span>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="placa"
+                          th:field="*{placa}"
+                          placeholder="Ex: ABC-1234"
+                          required
+                        />
+                        <div class="invalid-feedback">
+                          Por favor, informe a placa do automóvel.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label for="matricula" class="form-label">
+                        <i class="bi bi-fingerprint text-primary me-1"></i
+                        >Matrícula
+                      </label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-primary text-white">
+                          <i class="bi bi-fingerprint"></i>
+                        </span>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="matricula"
+                          th:field="*{matricula}"
+                          placeholder="Ex: A12345"
+                          required
+                        />
+                        <div class="invalid-feedback">
+                          Por favor, informe a matrícula do automóvel.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-4">
+                    <label for="precoDiaria" class="form-label">
+                      <i class="bi bi-currency-dollar text-primary me-1"></i
+                      >Preço da Diária (R$)
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-primary text-white">
+                        <i class="bi bi-currency-dollar"></i>
+                      </span>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="precoDiaria"
+                        th:field="*{precoDiaria}"
+                        step="0.01"
+                        min="0"
+                        placeholder="Ex: 150.00"
+                        required
+                      />
+                      <div class="invalid-feedback">
+                        Por favor, informe um valor válido para a diária.
+                      </div>
+                    </div>
+                    <small class="text-muted mt-1">
+                      <i class="bi bi-info-circle"></i>
+                      Informe o valor da diária do automóvel em reais.
+                    </small>
+                  </div>
+
+                  <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                      <i class="bi bi-save me-2"></i> Cadastrar Automóvel
+                    </button>
+                    <a
+                      href="/banco/automoveis"
+                      class="btn btn-outline-secondary"
+                    >
+                      <i class="bi bi-x-circle me-2"></i> Cancelar
+                    </a>
+                  </div>
+                </form>
+              </div>
+              <div class="card-footer bg-light py-3">
+                <div class="text-muted small">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Todos os campos são obrigatórios. Verifique os dados antes de
+                  enviar.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

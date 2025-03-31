@@ -1,69 +1,52 @@
 package br.com.luizcaliza.services;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import br.com.luizcaliza.model.Usuario;
 import br.com.luizcaliza.repositories.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-public abstract class UsuarioService<T extends Usuario> {
+import java.util.List;
 
-  protected final UsuarioRepository<T> repository;
+@Service
+public class UsuarioService implements UserDetailsService {
+
+  @Autowired
+  private UsuarioRepository usuarioRepository;
 
   @Autowired
   private PasswordEncoder passwordEncoder;
 
-  protected UsuarioService(UsuarioRepository<T> repository) {
-    this.repository = repository;
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    return usuarioRepository.findByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + username));
   }
 
-  public List<T> findAll() {
-    return repository.findAll();
+  public Usuario salvar(Usuario usuario) {
+    usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+    return usuarioRepository.save(usuario);
   }
 
-  public Page<T> findAll(Pageable pageable) {
-    return repository.findAll(pageable);
+  public Usuario buscarPorId(Long id) {
+    return usuarioRepository.findById(id).orElse(null);
   }
 
-  public Optional<T> findById(Long id) {
-    return repository.findById(id);
+  public Usuario buscarPorUsername(String username) {
+    return usuarioRepository.findByUsername(username).orElse(null);
   }
 
-  public Optional<T> findByUsername(String username) {
-    return repository.findByUsername(username);
-  }
-
-  public T save(T usuario) {
-    // Encode password before saving
-    usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-    return repository.save(usuario);
-  }
-
-  public T update(Long id, T usuario) {
-    return repository.findById(id).map(existingUsuario -> {
-
-      // Only update password if it's provided
-      if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
-        existingUsuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-      }
-
-      return repository.save(existingUsuario);
-    }).orElseThrow(() -> new RuntimeException("Usuário não encontrado com id: " + id));
-  }
-
-  public void delete(Long id) {
-    repository.deleteById(id);
+  public List<Usuario> listarTodos() {
+    return usuarioRepository.findAll();
   }
 
   public boolean autenticar(String username, String senha) {
-    Optional<T> usuario = repository.findByUsername(username);
-    if (usuario.isPresent()) {
-      return passwordEncoder.matches(senha, usuario.get().getPassword());
+    Usuario usuario = buscarPorUsername(username);
+    if (usuario != null) {
+      return passwordEncoder.matches(senha, usuario.getSenha());
     }
     return false;
   }

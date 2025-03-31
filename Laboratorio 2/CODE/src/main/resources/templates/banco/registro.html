@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Registro de Banco - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="card">
+              <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Registro de Banco</h5>
+              </div>
+              <div class="card-body">
+                <form
+                  th:action="@{/banco/registro}"
+                  method="post"
+                  th:object="${banco}"
+                >
+                  <div class="row">
+                    <div class="col-12">
+                      <h4 class="mb-3">Informações de Acesso</h4>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="username" class="form-label"
+                        >Nome de usuário</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="username"
+                        name="usuario.username"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="senha" class="form-label">Senha</label>
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="senha"
+                        name="usuario.senha"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-12">
+                      <h4 class="mt-4 mb-3">
+                        Informações da Instituição Financeira
+                      </h4>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="nome" class="form-label">Nome do Banco</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="nome"
+                        th:field="*{nome}"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="cnpj" class="form-label">CNPJ</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="cnpj"
+                        th:field="*{cnpj}"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-12 mt-4">
+                      <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">
+                          Registrar
+                        </button>
+                        <a href="/registro" class="btn btn-outline-secondary"
+                          >Voltar</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Automóveis - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between align-items-center my-4">
+          <h2 class="text-primary">
+            <i class="bi bi-car-front-fill me-2"></i>Meus Automóveis
+          </h2>
+          <div>
+            <a href="/banco/automoveis/novo" class="btn btn-primary me-2">
+              <i class="bi bi-plus-circle"></i> Novo Automóvel
+            </a>
+            <a href="/banco/dashboard" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left"></i> Voltar para Dashboard
+            </a>
+          </div>
+        </div>
+
+        <!-- Mensagens de alerta -->
+        <div
+          th:if="${param.success != null}"
+          class="alert alert-success alert-dismissible fade show mb-4"
+          role="alert"
+        >
+          <i class="bi bi-check-circle-fill me-2"></i>
+          <strong>Sucesso!</strong>
+          <span th:if="${param.success == 'automovel-atualizado'}"
+            >Automóvel atualizado com sucesso!</span
+          >
+          <span th:if="${param.success == 'automovel-cadastrado'}"
+            >Automóvel cadastrado com sucesso!</span
+          >
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div
+          th:if="${param.erro != null}"
+          class="alert alert-danger alert-dismissible fade show mb-4"
+          role="alert"
+        >
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <strong>Erro!</strong>
+          <span th:if="${param.erro == 'automovel-nao-encontrado'}"
+            >O automóvel solicitado não existe.</span
+          >
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <!-- Estatísticas no topo -->
+        <div class="row mb-4" th:unless="${#lists.isEmpty(automoveis)}">
+          <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+              <div
+                class="card-body position-relative"
+                style="background: linear-gradient(45deg, #f5f5f5, #e9ecef)"
+              >
+                <div
+                  class="position-absolute"
+                  style="top: 15px; right: 15px; opacity: 0.2"
+                >
+                  <i class="bi bi-car-front" style="font-size: 3rem"></i>
+                </div>
+                <h5 class="card-title">
+                  <i class="bi bi-car-front-fill me-2"></i>Total de Automóveis
+                </h5>
+                <p
+                  class="card-text display-4 fw-bold text-primary"
+                  th:text="${#lists.size(automoveis)}"
+                >
+                  5
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+              <div
+                class="card-body position-relative"
+                style="background: linear-gradient(45deg, #218838, #28a745)"
+              >
+                <div
+                  class="position-absolute"
+                  style="top: 15px; right: 15px; opacity: 0.2"
+                >
+                  <i class="bi bi-check-circle" style="font-size: 3rem"></i>
+                </div>
+                <h5 class="card-title text-white">
+                  <i class="bi bi-check-circle-fill me-2"></i>Disponíveis
+                </h5>
+                <p
+                  class="card-text display-4 fw-bold text-white"
+                  th:text="${#lists.size(automoveis.?[#lists.isEmpty(pedidos) || #lists.isEmpty(pedidos.?[status == 'APROVADO'])])}"
+                >
+                  3
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+              <div
+                class="card-body position-relative"
+                style="background: linear-gradient(45deg, #e0a800, #ffc107)"
+              >
+                <div
+                  class="position-absolute"
+                  style="top: 15px; right: 15px; opacity: 0.2"
+                >
+                  <i class="bi bi-hourglass" style="font-size: 3rem"></i>
+                </div>
+                <h5 class="card-title">
+                  <i class="bi bi-hourglass-split me-2"></i>Em Uso
+                </h5>
+                <p
+                  class="card-text display-4 fw-bold"
+                  th:text="${#lists.size(automoveis.?[!#lists.isEmpty(pedidos) && !#lists.isEmpty(pedidos.?[status == 'APROVADO'])])}"
+                >
+                  2
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">
+              <i class="bi bi-list-check me-2"></i>Lista de Automóveis
+            </h5>
+          </div>
+          <div class="card-body">
+            <div th:if="${#lists.isEmpty(automoveis)}" class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              <p class="mb-3">Você ainda não possui automóveis cadastrados.</p>
+              <a href="/banco/automoveis/novo" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Cadastrar Meu Primeiro
+                Automóvel
+              </a>
+            </div>
+            <div
+              th:unless="${#lists.isEmpty(automoveis)}"
+              class="table-responsive"
+            >
+              <table class="table table-striped table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th><i class="bi bi-tag text-muted me-1"></i>Marca</th>
+                    <th>
+                      <i class="bi bi-car-front text-muted me-1"></i>Modelo
+                    </th>
+                    <th><i class="bi bi-calendar text-muted me-1"></i>Ano</th>
+                    <th>
+                      <i class="bi bi-sign-turn-right text-muted me-1"></i>Placa
+                    </th>
+                    <th>
+                      <i class="bi bi-fingerprint text-muted me-1"></i>Matrícula
+                    </th>
+                    <th>
+                      <i class="bi bi-currency-dollar text-muted me-1"></i
+                      >Preço/Dia
+                    </th>
+                    <th>
+                      <i class="bi bi-circle-fill text-muted me-1"></i>Status
+                    </th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="automovel : ${automoveis}">
+                    <td class="fw-medium" th:text="${automovel.marca}">
+                      Toyota
+                    </td>
+                    <td th:text="${automovel.modelo}">Corolla</td>
+                    <td th:text="${automovel.ano}">2022</td>
+                    <td>
+                      <span
+                        class="badge bg-light text-dark border"
+                        th:text="${automovel.placa}"
+                        >ABC-1234</span
+                      >
+                    </td>
+                    <td class="text-muted" th:text="${automovel.matricula}">
+                      X12345
+                    </td>
+                    <td
+                      class="fw-bold text-end"
+                      th:text="${'R$ ' + #numbers.formatDecimal(automovel.precoDiaria, 1, 'POINT', 2, 'COMMA')}"
+                    >
+                      150,00
+                    </td>
+                    <td>
+                      <span
+                        th:if="${!#lists.isEmpty(automovel.pedidos) && !#lists.isEmpty(automovel.pedidos.?[status == 'APROVADO'])}"
+                        class="badge bg-warning text-dark"
+                        ><i class="bi bi-hourglass-split me-1"></i>Em uso</span
+                      >
+                      <span
+                        th:if="${#lists.isEmpty(automovel.pedidos) || #lists.isEmpty(automovel.pedidos.?[status == 'APROVADO'])}"
+                        class="badge bg-success text-white"
+                        ><i class="bi bi-check-circle me-1"></i>Disponível</span
+                      >
+                    </td>
+                    <td>
+                      <div class="btn-group" role="group">
+                        <a
+                          th:href="@{'/banco/automoveis/' + ${automovel.id} + '/detalhes'}"
+                          class="btn btn-sm btn-info text-white"
+                          title="Ver detalhes"
+                        >
+                          <i class="bi bi-eye-fill"></i>
+                        </a>
+                        <a
+                          th:href="@{'/banco/automoveis/' + ${automovel.id} + '/editar'}"
+                          class="btn btn-sm btn-primary"
+                          title="Editar automóvel"
+                        >
+                          <i class="bi bi-pencil-fill"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

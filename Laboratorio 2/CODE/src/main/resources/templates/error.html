@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Erro - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="card">
+              <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Erro</h5>
+              </div>
+              <div class="card-body text-center py-5">
+                <i
+                  class="bi bi-exclamation-triangle-fill text-danger"
+                  style="font-size: 4rem"
+                ></i>
+                <h2 class="mt-3" th:text="${status != null ? status : 'Erro'}">
+                  500
+                </h2>
+                <p
+                  class="lead"
+                  th:text="${message != null ? message : 'Ocorreu um erro ao processar sua solicitação.'}"
+                >
+                  Ocorreu um erro ao processar sua solicitação.
+                </p>
+                <div th:if="${path != null}" class="mt-3 text-muted">
+                  <p>
+                    <strong>Caminho:</strong> <span th:text="${path}"></span>
+                  </p>
+                </div>
+                <div th:if="${exception != null}" class="mt-3 text-start">
+                  <div class="alert alert-danger">
+                    <p>
+                      <strong>Erro:</strong>
+                      <span th:text="${exception}"></span>
+                    </p>
+                  </div>
+                </div>
+                <a href="/" class="btn btn-primary mt-3"
+                  >Voltar para a Página Inicial</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

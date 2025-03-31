@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Registro de Cliente - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="card">
+              <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Registro de Cliente</h5>
+              </div>
+              <div class="card-body">
+                <form
+                  th:action="@{/cliente/registro}"
+                  method="post"
+                  th:object="${cliente}"
+                >
+                  <div class="row">
+                    <div class="col-12">
+                      <h4 class="mb-3">Informações de Acesso</h4>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="username" class="form-label"
+                        >Nome de usuário</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="username"
+                        name="usuario.username"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="senha" class="form-label">Senha</label>
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="senha"
+                        name="usuario.senha"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-12">
+                      <h4 class="mt-4 mb-3">Informações Pessoais</h4>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="nome" class="form-label">Nome Completo</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="nome"
+                        th:field="*{nome}"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="cpf" class="form-label">CPF</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="cpf"
+                        th:field="*{cpf}"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="rg" class="form-label">RG</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="rg"
+                        th:field="*{rg}"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="profissao" class="form-label"
+                        >Profissão</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="profissao"
+                        th:field="*{profissao}"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-12 mb-3">
+                      <label for="endereco" class="form-label">Endereço</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="endereco"
+                        th:field="*{endereco}"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-12">
+                      <h4 class="mt-4 mb-3">Rendimentos</h4>
+                      <p class="text-muted">
+                        Você poderá adicionar seus rendimentos após o registro.
+                      </p>
+                    </div>
+
+                    <div class="col-12 mt-4">
+                      <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                          Registrar
+                        </button>
+                        <a href="/registro" class="btn btn-outline-secondary"
+                          >Voltar</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

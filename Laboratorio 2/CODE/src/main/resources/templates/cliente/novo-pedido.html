@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Novo Pedido - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="text-primary">
+            <i class="bi bi-plus-circle-fill me-2"></i>Novo Pedido de Aluguel
+          </h2>
+          <a href="/cliente/pedidos" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+          </a>
+        </div>
+
+        <!-- Mensagem de erro -->
+        <div
+          th:if="${param.erro}"
+          class="alert alert-danger alert-dismissible fade show mb-4"
+          role="alert"
+        >
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <strong>Erro!</strong> Ocorreu um problema ao processar seu pedido.
+          Verifique os dados e tente novamente.
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div class="card shadow-sm border-0">
+          <div
+            class="card-header position-relative text-white"
+            style="background: linear-gradient(45deg, #0062cc, #0069d9)"
+          >
+            <div
+              class="position-absolute"
+              style="top: 15px; right: 15px; opacity: 0.2"
+            >
+              <i class="bi bi-car-front" style="font-size: 3rem"></i>
+            </div>
+            <h5 class="card-title mb-0 py-2">
+              <i class="bi bi-file-earmark-text me-2"></i>Formulário de Pedido
+            </h5>
+          </div>
+          <div class="card-body p-4">
+            <form
+              th:action="@{/cliente/pedidos/novo}"
+              method="post"
+              th:object="${pedido}"
+              id="pedidoForm"
+              class="needs-validation"
+              novalidate
+            >
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  <div class="card h-100 bg-light border-0 shadow-sm">
+                    <div class="card-body">
+                      <h4 class="card-title mb-3 text-primary">
+                        <i class="bi bi-calendar-date me-2"></i>Informações do
+                        Período
+                      </h4>
+                      <div class="mb-3">
+                        <label for="dataInicio" class="form-label">
+                          <i class="bi bi-calendar-plus text-primary me-1"></i
+                          >Data de Início
+                        </label>
+                        <div class="input-group">
+                          <span class="input-group-text bg-primary text-white">
+                            <i class="bi bi-calendar-plus-fill"></i>
+                          </span>
+                          <input
+                            type="date"
+                            class="form-control"
+                            id="dataInicio"
+                            th:field="*{dataInicio}"
+                            required
+                            min="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"
+                            onchange="calcularValorTotal()"
+                          />
+                          <div class="invalid-feedback">
+                            Por favor, selecione a data de início.
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="dataFim" class="form-label">
+                          <i class="bi bi-calendar-minus text-primary me-1"></i
+                          >Data de Término
+                        </label>
+                        <div class="input-group">
+                          <span class="input-group-text bg-primary text-white">
+                            <i class="bi bi-calendar-minus-fill"></i>
+                          </span>
+                          <input
+                            type="date"
+                            class="form-control"
+                            id="dataFim"
+                            th:field="*{dataFim}"
+                            required
+                            min="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"
+                            onchange="calcularValorTotal()"
+                          />
+                          <div class="invalid-feedback">
+                            Por favor, selecione a data de término.
+                          </div>
+                        </div>
+                      </div>
+                      <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <small>O período de aluguel mínimo é de 1 dia.</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                      <h4 class="card-title mb-3 text-primary">
+                        <i class="bi bi-car-front-fill me-2"></i>Automóvel
+                      </h4>
+                      <p class="mb-3">
+                        Selecione o automóvel que deseja alugar:
+                      </p>
+
+                      <div class="list-group">
+                        <div
+                          th:each="auto : ${automoveis}"
+                          class="list-group-item list-group-item-action mb-2 border rounded-3 shadow-sm position-relative overflow-hidden"
+                        >
+                          <div
+                            class="position-absolute"
+                            style="top: 15px; right: 15px; opacity: 0.1"
+                          >
+                            <i
+                              class="bi bi-car-front"
+                              style="font-size: 2.5rem"
+                            ></i>
+                          </div>
+                          <div
+                            class="d-flex w-100 justify-content-between align-items-center"
+                          >
+                            <div>
+                              <h5
+                                class="mb-1 text-primary"
+                                th:text="${auto.marca + ' ' + auto.modelo + ' (' + auto.ano + ')'}"
+                              >
+                                Toyota Corolla (2020)
+                              </h5>
+                              <p class="mb-1">
+                                <span
+                                  class="badge bg-light text-dark border"
+                                  th:text="${'Placa: ' + auto.placa}"
+                                >
+                                  Placa: ABC-1234
+                                </span>
+                                <span
+                                  class="badge bg-success ms-2"
+                                  th:text="${'R$ ' + #numbers.formatDecimal(auto.precoDiaria, 1, 'POINT', 2, 'COMMA') + '/dia'}"
+                                  >R$ 150,00/dia</span
+                                >
+                              </p>
+                              <input
+                                type="hidden"
+                                th:id="${'preco-' + auto.id}"
+                                th:value="${auto.precoDiaria}"
+                              />
+                            </div>
+                            <div class="form-check">
+                              <input
+                                class="form-check-input auto-select"
+                                type="radio"
+                                th:field="*{automovel}"
+                                th:value="${auto.id}"
+                                th:id="${'auto-' + auto.id}"
+                                required
+                                onchange="calcularValorTotal()"
+                              />
+                              <label
+                                class="form-check-label"
+                                th:for="${'auto-' + auto.id}"
+                              >
+                                Selecionar
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        th:if="${#lists.isEmpty(automoveis)}"
+                        class="alert alert-warning mt-3"
+                      >
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <p>Não há automóveis disponíveis no momento.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <div class="col-12">
+                  <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-success text-white">
+                      <h4 class="card-title mb-0">
+                        <i class="bi bi-receipt me-2"></i>Resumo do Pedido
+                      </h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-md-8">
+                          <p>
+                            <i
+                              class="bi bi-calendar-range text-primary me-2"
+                            ></i>
+                            <span id="resumoDias" class="fw-medium"
+                              >Período: Selecione as datas</span
+                            >
+                          </p>
+                          <p>
+                            <i class="bi bi-car-front text-primary me-2"></i>
+                            <span id="resumoAutomovel" class="fw-medium"
+                              >Automóvel: Selecione um automóvel</span
+                            >
+                          </p>
+                          <p>
+                            <i
+                              class="bi bi-currency-dollar text-primary me-2"
+                            ></i>
+                            <span id="resumoPreco" class="fw-medium"
+                              >Preço diária: --</span
+                            >
+                          </p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                          <h5 class="text-success">Valor Total:</h5>
+                          <h3
+                            id="valorTotalDisplay"
+                            class="text-success fw-bold"
+                          >
+                            R$ 0,00
+                          </h3>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                      <label for="valorTotal" class="form-label">
+                        <i class="bi bi-cash-stack text-primary me-1"></i>Valor
+                        Total Estimado (R$)
+                      </label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-primary text-white">
+                          <i class="bi bi-cash-stack"></i>
+                        </span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          class="form-control fw-bold"
+                          id="valorTotal"
+                          th:field="*{valorTotal}"
+                          required
+                          readonly
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="observacoes" class="form-label">
+                        <i class="bi bi-chat-left-text text-primary me-1"></i
+                        >Observações
+                      </label>
+                      <textarea
+                        class="form-control"
+                        id="observacoes"
+                        name="observacoes"
+                        rows="3"
+                        placeholder="Informe quaisquer observações relevantes para o seu pedido"
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12">
+                  <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                      <i class="bi bi-check-circle me-2"></i> Enviar Pedido
+                    </button>
+                    <a
+                      href="/cliente/pedidos"
+                      class="btn btn-outline-secondary"
+                    >
+                      <i class="bi bi-x-circle me-2"></i>Cancelar
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="card-footer bg-light text-muted py-3">
+            <i class="bi bi-info-circle me-2"></i>
+            Após enviar seu pedido, ele será analisado pela nossa equipe.
+          </div>
+        </div>
+      </div>
+
+      <script>
+        function calcularValorTotal() {
+          const dataInicio = document.getElementById("dataInicio").value;
+          const dataFim = document.getElementById("dataFim").value;
+          const automovelSelecionado = document.querySelector(
+            ".auto-select:checked"
+          );
+
+          // Reset
+          document.getElementById("resumoDias").textContent =
+            "Período: Selecione as datas";
+          document.getElementById("resumoAutomovel").textContent =
+            "Automóvel: Selecione um automóvel";
+          document.getElementById("resumoPreco").textContent =
+            "Preço diária: --";
+          document.getElementById("valorTotalDisplay").textContent = "R$ 0,00";
+          document.getElementById("valorTotal").value = 0;
+
+          if (!dataInicio || !dataFim || !automovelSelecionado) {
+            return;
+          }
+
+          // Calcular número de dias
+          const inicio = new Date(dataInicio);
+          const fim = new Date(dataFim);
+
+          if (fim < inicio) {
+            alert("A data de término deve ser posterior à data de início!");
+            document.getElementById("dataFim").value = "";
+            return;
+          }
+
+          const umDiaEmMs = 1000 * 60 * 60 * 24;
+          const diferencaEmMs = fim.getTime() - inicio.getTime();
+          const numeroDias = Math.ceil(diferencaEmMs / umDiaEmMs) + 1; // Inclusivo
+
+          // Obter preço do automóvel selecionado
+          const automovelId = automovelSelecionado.value;
+          const precoPorDia = parseFloat(
+            document.getElementById("preco-" + automovelId).value
+          );
+
+          // Calcular valor total
+          const valorTotal = numeroDias * precoPorDia;
+
+          // Atualizar os elementos na tela
+          const automovelLabel = document
+            .querySelector('label[for="auto-' + automovelId + '"]')
+            .parentNode.parentNode.querySelector("h5").textContent;
+
+          document.getElementById("resumoDias").textContent =
+            "Período: " +
+            formatarDataBR(inicio) +
+            " a " +
+            formatarDataBR(fim) +
+            " (" +
+            numeroDias +
+            " dias)";
+          document.getElementById("resumoAutomovel").textContent =
+            "Automóvel: " + automovelLabel;
+          document.getElementById("resumoPreco").textContent =
+            "Preço diária: R$ " + precoPorDia.toFixed(2).replace(".", ",");
+          document.getElementById("valorTotalDisplay").textContent =
+            "R$ " + valorTotal.toFixed(2).replace(".", ",");
+          document.getElementById("valorTotal").value = valorTotal.toFixed(2);
+        }
+
+        function formatarDataBR(data) {
+          const dia = data.getDate().toString().padStart(2, "0");
+          const mes = (data.getMonth() + 1).toString().padStart(2, "0");
+          const ano = data.getFullYear();
+          return dia + "/" + mes + "/" + ano;
+        }
+
+        // Validação do formulário Bootstrap
+        (() => {
+          "use strict";
+          const forms = document.querySelectorAll(".needs-validation");
+          Array.from(forms).forEach((form) => {
+            form.addEventListener(
+              "submit",
+              (event) => {
+                if (!form.checkValidity()) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                form.classList.add("was-validated");
+              },
+              false
+            );
+          });
+        })();
+      </script>
+    </main>
+  </body>
+</html>

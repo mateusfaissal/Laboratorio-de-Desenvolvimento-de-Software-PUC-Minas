@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Detalhes do Pedido - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Detalhes do Pedido #<span th:text="${pedido.id}">1</span></h2>
+          <a href="/cliente/pedidos" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para Pedidos
+          </a>
+        </div>
+
+        <div class="row">
+          <div class="col-md-8">
+            <!-- Informações do Pedido -->
+            <div class="card mb-4">
+              <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Informações do Pedido</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <dl class="row">
+                      <dt class="col-sm-5">Status:</dt>
+                      <dd class="col-sm-7">
+                        <span
+                          th:class="'badge rounded-pill ' + 
+                              (${pedido.status == 'NOVO'} ? 'bg-secondary' : 
+                              (${pedido.status == 'EM_ANALISE'} ? 'bg-info' : 
+                              (${pedido.status == 'APROVADO'} ? 'bg-success' : 
+                              (${pedido.status == 'RECUSADO'} ? 'bg-danger' : 
+                              (${pedido.status == 'CANCELADO'} ? 'bg-warning' : 'bg-dark')))))"
+                          th:text="${pedido.status}"
+                          >NOVO</span
+                        >
+                      </dd>
+
+                      <dt class="col-sm-5">Data de Criação:</dt>
+                      <dd
+                        class="col-sm-7"
+                        th:text="${#dates.format(pedido.dataCriacao, 'dd/MM/yyyy HH:mm')}"
+                      >
+                        01/01/2023 12:00
+                      </dd>
+
+                      <dt class="col-sm-5">Data de Início:</dt>
+                      <dd
+                        class="col-sm-7"
+                        th:text="${pedido.dataInicio != null ? #dates.format(pedido.dataInicio, 'dd/MM/yyyy') : 'Não definida'}"
+                      >
+                        10/01/2023
+                      </dd>
+
+                      <dt class="col-sm-5">Data de Término:</dt>
+                      <dd
+                        class="col-sm-7"
+                        th:text="${pedido.dataFim != null ? #dates.format(pedido.dataFim, 'dd/MM/yyyy') : 'Não definida'}"
+                      >
+                        20/01/2023
+                      </dd>
+                    </dl>
+                  </div>
+                  <div class="col-md-6">
+                    <dl class="row">
+                      <dt class="col-sm-5">Valor Total:</dt>
+                      <dd
+                        class="col-sm-7"
+                        th:text="${pedido.valorTotal != null ? #numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA') + ' R$' : 'Não definido'}"
+                      >
+                        1.500,00 R$
+                      </dd>
+
+                      <dt class="col-sm-5">Avaliador:</dt>
+
+                      <dt class="col-sm-5">Contrato:</dt>
+                      <dd
+                        class="col-sm-7"
+                        th:text="${pedido.contrato != null ? 'Contrato #' + pedido.contrato.id : 'Não gerado'}"
+                      >
+                        Não gerado
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer" th:if="${pedido.status == 'NOVO'}">
+                <div class="d-flex justify-content-end gap-2">
+                  <a
+                    th:href="@{'/cliente/pedidos/' + ${pedido.id} + '/editar'}"
+                    class="btn btn-primary"
+                  >
+                    <i class="bi bi-pencil"></i> Editar Pedido
+                  </a>
+                  <a
+                    th:href="@{'/cliente/pedidos/' + ${pedido.id} + '/cancelar'}"
+                    class="btn btn-danger"
+                    onclick="return confirm('Tem certeza que deseja cancelar este pedido?')"
+                  >
+                    <i class="bi bi-x-circle"></i> Cancelar
+                  </a>
+                </div>
+              </div>
+              <div class="card-footer" th:if="${pedido.status == 'EM_ANALISE'}">
+                <div class="d-flex justify-content-end">
+                  <a
+                    th:href="@{'/cliente/pedidos/' + ${pedido.id} + '/cancelar'}"
+                    class="btn btn-danger"
+                    onclick="return confirm('Tem certeza que deseja cancelar este pedido?')"
+                  >
+                    <i class="bi bi-x-circle"></i> Cancelar
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <!-- Informações do Automóvel -->
+            <div class="card mb-4" th:if="${pedido.automovel != null}">
+              <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Automóvel</h5>
+              </div>
+              <div class="card-body">
+                <h5
+                  th:text="${pedido.automovel.marca + ' ' + pedido.automovel.modelo + ' (' + pedido.automovel.ano + ')'}"
+                >
+                  Toyota Corolla (2020)
+                </h5>
+                <dl class="row mt-3">
+                  <dt class="col-sm-4">Placa:</dt>
+                  <dd class="col-sm-8" th:text="${pedido.automovel.placa}">
+                    ABC-1234
+                  </dd>
+
+                  <dt class="col-sm-4">Matrícula:</dt>
+                  <dd class="col-sm-8" th:text="${pedido.automovel.matricula}">
+                    X12345
+                  </dd>
+                </dl>
+              </div>
+            </div>
+
+            <!-- Informações do Contrato -->
+            <div class="card" th:if="${pedido.contrato != null}">
+              <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Contrato</h5>
+              </div>
+              <div class="card-body">
+                <dl class="row">
+                  <dt class="col-sm-5">Número:</dt>
+                  <dd class="col-sm-7" th:text="${'#' + pedido.contrato.id}">
+                    #123
+                  </dd>
+
+                  <dt class="col-sm-5">Data:</dt>
+                  <dd
+                    class="col-sm-7"
+                    th:text="${#dates.format(pedido.contrato.data, 'dd/MM/yyyy')}"
+                  >
+                    05/01/2023
+                  </dd>
+
+                  <dt class="col-sm-5">Valor:</dt>
+                  <dd
+                    class="col-sm-7"
+                    th:text="${#numbers.formatDecimal(pedido.contrato.valor, 1, 'POINT', 2, 'COMMA') + ' R$'}"
+                  >
+                    1.500,00 R$
+                  </dd>
+
+                  <dt class="col-sm-5">Banco:</dt>
+                  <dd
+                    class="col-sm-7"
+                    th:text="${pedido.contrato.banco != null ? pedido.contrato.banco.nome : 'Não informado'}"
+                  >
+                    Banco Nacional
+                  </dd>
+
+                  <dt class="col-sm-5">Status:</dt>
+                  <dd class="col-sm-7">
+                    <span
+                      th:class="${pedido.contrato.ativo ? 'badge bg-success' : 'badge bg-danger'}"
+                      th:text="${pedido.contrato.ativo ? 'Ativo' : 'Inativo'}"
+                    >
+                      Ativo
+                    </span>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

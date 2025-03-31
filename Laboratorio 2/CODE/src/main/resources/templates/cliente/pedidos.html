@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Meus Pedidos - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Meus Pedidos</h2>
+          <a href="/cliente/pedidos/novo" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Novo Pedido
+          </a>
+        </div>
+
+        <!-- Mensagens de erro -->
+        <div
+          th:if="${param.erro == 'pedido-nao-encontrado'}"
+          class="alert alert-danger alert-dismissible fade show mb-4"
+          role="alert"
+        >
+          <strong>Erro!</strong> O pedido solicitado não existe ou não pode ser
+          editado.
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div
+          th:if="${param.erro == 'atualizacao-falhou'}"
+          class="alert alert-danger alert-dismissible fade show mb-4"
+          role="alert"
+        >
+          <strong>Erro!</strong> Não foi possível atualizar o pedido. Verifique
+          as informações e tente novamente.
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs">
+              <li class="nav-item">
+                <a class="nav-link active" href="#todos" data-bs-toggle="tab"
+                  >Todos</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#novos" data-bs-toggle="tab">Novos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#emAnalise" data-bs-toggle="tab"
+                  >Em Análise</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#aprovados" data-bs-toggle="tab"
+                  >Aprovados</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#recusados" data-bs-toggle="tab"
+                  >Recusados</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#cancelados" data-bs-toggle="tab"
+                  >Cancelados</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="card-body">
+            <div class="tab-content">
+              <div class="tab-pane fade show active" id="todos">
+                <div
+                  th:if="${#lists.isEmpty(pedidos)}"
+                  class="alert alert-info"
+                >
+                  Você ainda não possui pedidos.
+                  <a href="/cliente/pedidos/novo">Criar um pedido</a>.
+                </div>
+                <div
+                  th:unless="${#lists.isEmpty(pedidos)}"
+                  class="table-responsive"
+                >
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Automóvel</th>
+                        <th>Período</th>
+                        <th>Valor Total</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr th:each="pedido : ${pedidos}">
+                        <td th:text="${pedido.id}">1</td>
+                        <td
+                          th:text="${#dates.format(pedido.dataCriacao, 'dd/MM/yyyy')}"
+                        >
+                          01/01/2023
+                        </td>
+                        <td
+                          th:text="${pedido.automovel != null ? pedido.automovel.marca + ' ' + pedido.automovel.modelo : 'N/A'}"
+                        >
+                          Toyota Corolla
+                        </td>
+                        <td
+                          th:text="${pedido.dataInicio != null && pedido.dataFim != null ? 
+                                                #dates.format(pedido.dataInicio, 'dd/MM/yyyy') + ' a ' + 
+                                                #dates.format(pedido.dataFim, 'dd/MM/yyyy') : 'N/A'}"
+                        >
+                          01/01/2023 a 15/01/2023
+                        </td>
+                        <td
+                          th:text="${pedido.valorTotal != null ? #numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA') + ' R$' : 'N/A'}"
+                        >
+                          1.500,00 R$
+                        </td>
+                        <td>
+                          <span
+                            th:class="'badge rounded-pill ' + 
+                                                    (${pedido.status == 'NOVO'} ? 'bg-secondary' : 
+                                                    (${pedido.status == 'EM_ANALISE'} ? 'bg-info' : 
+                                                    (${pedido.status == 'APROVADO'} ? 'bg-success' : 
+                                                    (${pedido.status == 'RECUSADO'} ? 'bg-danger' : 
+                                                    (${pedido.status == 'CANCELADO'} ? 'bg-warning' : 'bg-dark')))))"
+                            th:text="${pedido.status}"
+                            >NOVO</span
+                          >
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <a
+                              th:href="@{'/cliente/pedidos/' + ${pedido.id}}"
+                              class="btn btn-sm btn-info"
+                            >
+                              <i class="bi bi-eye"></i>
+                            </a>
+                            <a
+                              th:if="${pedido.status == 'NOVO'}"
+                              th:href="@{'/cliente/pedidos/' + ${pedido.id} + '/editar'}"
+                              class="btn btn-sm btn-primary"
+                            >
+                              <i class="bi bi-pencil"></i>
+                            </a>
+                            <a
+                              th:if="${pedido.status == 'NOVO' || pedido.status == 'EM_ANALISE'}"
+                              th:href="@{'/cliente/pedidos/' + ${pedido.id} + '/cancelar'}"
+                              class="btn btn-sm btn-danger"
+                              onclick="return confirm('Tem certeza que deseja cancelar este pedido?')"
+                            >
+                              <i class="bi bi-x-circle"></i>
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="novos">
+                <div
+                  th:if="${#lists.isEmpty(pedidos.?[status == 'NOVO'])}"
+                  class="alert alert-info"
+                >
+                  Não há pedidos novos.
+                </div>
+                <div
+                  th:unless="${#lists.isEmpty(pedidos.?[status == 'NOVO'])}"
+                  class="table-responsive"
+                >
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Automóvel</th>
+                        <th>Período</th>
+                        <th>Valor Total</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr th:each="pedido : ${pedidos.?[status == 'NOVO']}">
+                        <td th:text="${pedido.id}">1</td>
+                        <td
+                          th:text="${#dates.format(pedido.dataCriacao, 'dd/MM/yyyy')}"
+                        >
+                          01/01/2023
+                        </td>
+                        <td
+                          th:text="${pedido.automovel != null ? pedido.automovel.marca + ' ' + pedido.automovel.modelo : 'N/A'}"
+                        >
+                          Toyota Corolla
+                        </td>
+                        <td
+                          th:text="${pedido.dataInicio != null && pedido.dataFim != null ? 
+                                                #dates.format(pedido.dataInicio, 'dd/MM/yyyy') + ' a ' + 
+                                                #dates.format(pedido.dataFim, 'dd/MM/yyyy') : 'N/A'}"
+                        >
+                          01/01/2023 a 15/01/2023
+                        </td>
+                        <td
+                          th:text="${pedido.valorTotal != null ? #numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA') + ' R$' : 'N/A'}"
+                        >
+                          1.500,00 R$
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <a
+                              th:href="@{'/cliente/pedidos/' + ${pedido.id}}"
+                              class="btn btn-sm btn-info"
+                            >
+                              <i class="bi bi-eye"></i>
+                            </a>
+                            <a
+                              th:href="@{'/cliente/pedidos/' + ${pedido.id} + '/editar'}"
+                              class="btn btn-sm btn-primary"
+                            >
+                              <i class="bi bi-pencil"></i>
+                            </a>
+                            <a
+                              th:href="@{'/cliente/pedidos/' + ${pedido.id} + '/cancelar'}"
+                              class="btn btn-sm btn-danger"
+                              onclick="return confirm('Tem certeza que deseja cancelar este pedido?')"
+                            >
+                              <i class="bi bi-x-circle"></i>
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="emAnalise">
+                <div
+                  th:if="${#lists.isEmpty(pedidos.?[status == 'EM_ANALISE'])}"
+                  class="alert alert-info"
+                >
+                  Não há pedidos em análise.
+                </div>
+                <div
+                  th:unless="${#lists.isEmpty(pedidos.?[status == 'EM_ANALISE'])}"
+                  class="table-responsive"
+                >
+                  <!-- Similar table structure for "Em Análise" pedidos -->
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Automóvel</th>
+                        <th>Período</th>
+                        <th>Valor Total</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        th:each="pedido : ${pedidos.?[status == 'EM_ANALISE']}"
+                      >
+                        <!-- Similar row structure for "Em Análise" pedidos -->
+                        <td th:text="${pedido.id}">1</td>
+                        <td
+                          th:text="${#dates.format(pedido.dataCriacao, 'dd/MM/yyyy')}"
+                        >
+                          01/01/2023
+                        </td>
+                        <td
+                          th:text="${pedido.automovel != null ? pedido.automovel.marca + ' ' + pedido.automovel.modelo : 'N/A'}"
+                        >
+                          Toyota Corolla
+                        </td>
+                        <td
+                          th:text="${pedido.dataInicio != null && pedido.dataFim != null ? 
+                                                #dates.format(pedido.dataInicio, 'dd/MM/yyyy') + ' a ' + 
+                                                #dates.format(pedido.dataFim, 'dd/MM/yyyy') : 'N/A'}"
+                        >
+                          01/01/2023 a 15/01/2023
+                        </td>
+                        <td
+                          th:text="${pedido.valorTotal != null ? #numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA') + ' R$' : 'N/A'}"
+                        >
+                          1.500,00 R$
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <a
+                              th:href="@{'/cliente/pedidos/' + ${pedido.id}}"
+                              class="btn btn-sm btn-info"
+                            >
+                              <i class="bi bi-eye"></i>
+                            </a>
+                            <a
+                              th:href="@{'/cliente/pedidos/' + ${pedido.id} + '/cancelar'}"
+                              class="btn btn-sm btn-danger"
+                              onclick="return confirm('Tem certeza que deseja cancelar este pedido?')"
+                            >
+                              <i class="bi bi-x-circle"></i>
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="aprovados">
+                <div
+                  th:if="${#lists.isEmpty(pedidos.?[status == 'APROVADO'])}"
+                  class="alert alert-info"
+                >
+                  Não há pedidos aprovados.
+                </div>
+                <div
+                  th:unless="${#lists.isEmpty(pedidos.?[status == 'APROVADO'])}"
+                  class="table-responsive"
+                >
+                  <!-- Similar table structure for "Aprovados" pedidos -->
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Automóvel</th>
+                        <th>Período</th>
+                        <th>Valor Total</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr th:each="pedido : ${pedidos.?[status == 'APROVADO']}">
+                        <!-- Similar row structure for "Aprovados" pedidos -->
+                        <td th:text="${pedido.id}">1</td>
+                        <td
+                          th:text="${#dates.format(pedido.dataCriacao, 'dd/MM/yyyy')}"
+                        >
+                          01/01/2023
+                        </td>
+                        <td
+                          th:text="${pedido.automovel != null ? pedido.automovel.marca + ' ' + pedido.automovel.modelo : 'N/A'}"
+                        >
+                          Toyota Corolla
+                        </td>
+                        <td
+                          th:text="${pedido.dataInicio != null && pedido.dataFim != null ? 
+                                                #dates.format(pedido.dataInicio, 'dd/MM/yyyy') + ' a ' + 
+                                                #dates.format(pedido.dataFim, 'dd/MM/yyyy') : 'N/A'}"
+                        >
+                          01/01/2023 a 15/01/2023
+                        </td>
+                        <td
+                          th:text="${pedido.valorTotal != null ? #numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA') + ' R$' : 'N/A'}"
+                        >
+                          1.500,00 R$
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <a
+                              th:href="@{'/cliente/pedidos/' + ${pedido.id}}"
+                              class="btn btn-sm btn-info"
+                            >
+                              <i class="bi bi-eye"></i>
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="recusados">
+                <div
+                  th:if="${#lists.isEmpty(pedidos.?[status == 'RECUSADO'])}"
+                  class="alert alert-info"
+                >
+                  Não há pedidos recusados.
+                </div>
+                <div
+                  th:unless="${#lists.isEmpty(pedidos.?[status == 'RECUSADO'])}"
+                  class="table-responsive"
+                >
+                  <!-- Similar table structure for "Recusados" pedidos -->
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Automóvel</th>
+                        <th>Período</th>
+                        <th>Valor Total</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr th:each="pedido : ${pedidos.?[status == 'RECUSADO']}">
+                        <!-- Similar row structure for "Recusados" pedidos -->
+                        <td th:text="${pedido.id}">1</td>
+                        <td
+                          th:text="${#dates.format(pedido.dataCriacao, 'dd/MM/yyyy')}"
+                        >
+                          01/01/2023
+                        </td>
+                        <td
+                          th:text="${pedido.automovel != null ? pedido.automovel.marca + ' ' + pedido.automovel.modelo : 'N/A'}"
+                        >
+                          Toyota Corolla
+                        </td>
+                        <td
+                          th:text="${pedido.dataInicio != null && pedido.dataFim != null ? 
+                                                #dates.format(pedido.dataInicio, 'dd/MM/yyyy') + ' a ' + 
+                                                #dates.format(pedido.dataFim, 'dd/MM/yyyy') : 'N/A'}"
+                        >
+                          01/01/2023 a 15/01/2023
+                        </td>
+                        <td
+                          th:text="${pedido.valorTotal != null ? #numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA') + ' R$' : 'N/A'}"
+                        >
+                          1.500,00 R$
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <a
+                              th:href="@{'/cliente/pedidos/' + ${pedido.id}}"
+                              class="btn btn-sm btn-info"
+                            >
+                              <i class="bi bi-eye"></i>
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="cancelados">
+                <div
+                  th:if="${#lists.isEmpty(pedidos.?[status == 'CANCELADO'])}"
+                  class="alert alert-info"
+                >
+                  Não há pedidos cancelados.
+                </div>
+                <div
+                  th:unless="${#lists.isEmpty(pedidos.?[status == 'CANCELADO'])}"
+                  class="table-responsive"
+                >
+                  <!-- Similar table structure for "Cancelados" pedidos -->
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Automóvel</th>
+                        <th>Período</th>
+                        <th>Valor Total</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        th:each="pedido : ${pedidos.?[status == 'CANCELADO']}"
+                      >
+                        <!-- Similar row structure for "Cancelados" pedidos -->
+                        <td th:text="${pedido.id}">1</td>
+                        <td
+                          th:text="${#dates.format(pedido.dataCriacao, 'dd/MM/yyyy')}"
+                        >
+                          01/01/2023
+                        </td>
+                        <td
+                          th:text="${pedido.automovel != null ? pedido.automovel.marca + ' ' + pedido.automovel.modelo : 'N/A'}"
+                        >
+                          Toyota Corolla
+                        </td>
+                        <td
+                          th:text="${pedido.dataInicio != null && pedido.dataFim != null ? 
+                                                #dates.format(pedido.dataInicio, 'dd/MM/yyyy') + ' a ' + 
+                                                #dates.format(pedido.dataFim, 'dd/MM/yyyy') : 'N/A'}"
+                        >
+                          01/01/2023 a 15/01/2023
+                        </td>
+                        <td
+                          th:text="${pedido.valorTotal != null ? #numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA') + ' R$' : 'N/A'}"
+                        >
+                          1.500,00 R$
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <a
+                              th:href="@{'/cliente/pedidos/' + ${pedido.id}}"
+                              class="btn btn-sm btn-info"
+                            >
+                              <i class="bi bi-eye"></i>
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

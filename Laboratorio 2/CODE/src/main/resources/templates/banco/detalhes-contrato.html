@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Detalhes do Contrato - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Detalhes do Contrato #<span th:text="${contrato.id}">1</span></h2>
+          <a href="/banco/contratos" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para Contratos
+          </a>
+        </div>
+
+        <div class="row">
+          <div class="col-md-8">
+            <!-- Informações do Contrato -->
+            <div class="card mb-4">
+              <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Informações do Contrato</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <dl class="row">
+                      <dt class="col-sm-5">Status:</dt>
+                      <dd class="col-sm-7">
+                        <span
+                          th:class="'badge rounded-pill ' + (${contrato.ativo} ? 'bg-success' : 'bg-secondary')"
+                          th:text="${contrato.ativo ? 'ATIVO' : 'INATIVO'}"
+                          >ATIVO</span
+                        >
+                      </dd>
+
+                      <dt class="col-sm-5">Data de Criação:</dt>
+                      <dd
+                        class="col-sm-7"
+                        th:text="${#dates.format(contrato.data, 'dd/MM/yyyy HH:mm')}"
+                      >
+                        01/01/2023 12:00
+                      </dd>
+
+                      <dt class="col-sm-5">Valor:</dt>
+                      <dd
+                        class="col-sm-7"
+                        th:text="${#numbers.formatDecimal(contrato.valor, 1, 'POINT', 2, 'COMMA') + ' R$'}"
+                      >
+                        5.000,00 R$
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+
+                <h5 class="mt-4">Condições do Contrato</h5>
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <p class="mb-0" th:text="${contrato.condicoes}">
+                      Detalhes das condições do contrato...
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer" th:if="${!contrato.ativo}">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="mb-0">
+                      <strong>Atenção:</strong> Este contrato ainda não está
+                      ativo.
+                    </p>
+                  </div>
+                  <div>
+                    <a
+                      th:href="@{'/banco/contratos/' + ${contrato.id} + '/validar'}"
+                      class="btn btn-success"
+                    >
+                      <i class="bi bi-check-circle"></i> Validar Contrato
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <!-- Pedidos Associados -->
+            <div class="card mb-4">
+              <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Pedidos Associados</h5>
+              </div>
+              <div class="card-body">
+                <div
+                  th:if="${#lists.isEmpty(contrato.pedidos)}"
+                  class="alert alert-info"
+                >
+                  Não há pedidos associados a este contrato.
+                </div>
+                <div
+                  th:unless="${#lists.isEmpty(contrato.pedidos)}"
+                  class="list-group"
+                >
+                  <a
+                    th:each="pedido : ${contrato.pedidos}"
+                    th:href="@{'/banco/pedidos/' + ${pedido.id}}"
+                    class="list-group-item list-group-item-action"
+                  >
+                    <div class="d-flex w-100 justify-content-between">
+                      <h6 class="mb-1" th:text="${'Pedido #' + pedido.id}">
+                        Pedido #1
+                      </h6>
+                      <small
+                        th:text="${#dates.format(pedido.dataCriacao, 'dd/MM/yyyy')}"
+                        >01/01/2023</small
+                      >
+                    </div>
+                    <p class="mb-1" th:text="${pedido.cliente.nome}">
+                      Nome do Cliente
+                    </p>
+                    <small
+                      th:text="${pedido.automovel != null ? pedido.automovel.marca + ' ' + pedido.automovel.modelo : 'Sem automóvel'}"
+                      >Toyota Corolla</small
+                    >
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

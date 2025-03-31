@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Detalhes do Pedido - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="text-primary">
+            <i class="bi bi-file-earmark-text me-2"></i> Detalhes do Pedido
+            #<span th:text="${pedido.id}" class="badge bg-primary rounded-pill"
+              >1</span
+            >
+          </h2>
+          <a href="/banco/pedidos" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Voltar para Pedidos
+          </a>
+        </div>
+
+        <div class="row">
+          <div class="col-md-8">
+            <!-- Informações do Pedido -->
+            <div class="card shadow-sm border-0 mb-4">
+              <div
+                class="card-header position-relative text-white"
+                style="background: linear-gradient(45deg, #0062cc, #0069d9)"
+              >
+                <div
+                  class="position-absolute"
+                  style="top: 15px; right: 15px; opacity: 0.2"
+                >
+                  <i
+                    class="bi bi-file-earmark-text"
+                    style="font-size: 3rem"
+                  ></i>
+                </div>
+                <h5 class="card-title mb-0 py-2">
+                  <i class="bi bi-info-circle me-2"></i>Informações do Pedido
+                </h5>
+              </div>
+              <div class="card-body p-4">
+                <div class="row">
+                  <div class="col-md-6">
+                    <dl class="row">
+                      <dt class="col-sm-5 text-primary">
+                        <i class="bi bi-tag-fill me-1"></i> Status:
+                      </dt>
+                      <dd class="col-sm-7">
+                        <span
+                          th:class="'badge rounded-pill ' + 
+                              (${pedido.status == 'NOVO'} ? 'bg-secondary' : 
+                              (${pedido.status == 'EM_ANALISE'} ? 'bg-info' : 
+                              (${pedido.status == 'APROVADO'} ? 'bg-success' : 
+                              (${pedido.status == 'RECUSADO'} ? 'bg-danger' : 
+                              (${pedido.status == 'CANCELADO'} ? 'bg-warning' : 'bg-dark')))))"
+                          th:text="${pedido.status}"
+                          >NOVO</span
+                        >
+                      </dd>
+
+                      <dt class="col-sm-5 text-primary">
+                        <i class="bi bi-calendar-fill me-1"></i> Data da
+                        Solicitação:
+                      </dt>
+                      <dd class="col-sm-7">
+                        <span
+                          th:text="${#dates.format(pedido.dataCriacao, 'dd/MM/yyyy HH:mm')}"
+                          >01/01/2023 14:30</span
+                        >
+                      </dd>
+
+                      <dt class="col-sm-5 text-primary">
+                        <i class="bi bi-calendar-check-fill me-1"></i> Data de
+                        Início:
+                      </dt>
+                      <dd class="col-sm-7">
+                        <span
+                          th:text="${#dates.format(pedido.dataInicio, 'dd/MM/yyyy')}"
+                          >10/01/2023</span
+                        >
+                      </dd>
+
+                      <dt class="col-sm-5 text-primary">
+                        <i class="bi bi-calendar-x-fill me-1"></i> Data de Fim:
+                      </dt>
+                      <dd class="col-sm-7">
+                        <span
+                          th:text="${#dates.format(pedido.dataFim, 'dd/MM/yyyy')}"
+                          >20/01/2023</span
+                        >
+                      </dd>
+
+                      <dt class="col-sm-5 text-primary">
+                        <i class="bi bi-currency-dollar me-1"></i> Valor Total:
+                      </dt>
+                      <dd class="col-sm-7">
+                        <span
+                          class="fw-bold text-success"
+                          th:text="${'R$ ' + #numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA')}"
+                          >R$ 1.500,00</span
+                        >
+                      </dd>
+
+                      <dt
+                        th:if="${pedido.motivoRecusa != null}"
+                        class="col-sm-5 text-primary"
+                      >
+                        <i class="bi bi-chat-left-text-fill me-1"></i> Motivo da
+                        Recusa:
+                      </dt>
+                      <dd
+                        th:if="${pedido.motivoRecusa != null}"
+                        class="col-sm-7"
+                      >
+                        <span
+                          class="text-danger"
+                          th:text="${pedido.motivoRecusa}"
+                          >Motivo</span
+                        >
+                      </dd>
+                    </dl>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="card bg-light border-0 shadow-sm mb-3">
+                      <div class="card-body">
+                        <h6 class="card-title text-primary mb-3">
+                          <i class="bi bi-person-fill me-1"></i>Informações do
+                          Cliente
+                        </h6>
+                        <dl class="row mb-0">
+                          <dt class="col-sm-5 text-muted">
+                            <i class="bi bi-person me-1"></i>Nome:
+                          </dt>
+                          <dd
+                            class="col-sm-7 fw-medium"
+                            th:text="${pedido.cliente.nome}"
+                          >
+                            João Silva
+                          </dd>
+
+                          <dt class="col-sm-5 text-muted">
+                            <i class="bi bi-person-badge me-1"></i>CPF:
+                          </dt>
+                          <dd class="col-sm-7" th:text="${pedido.cliente.cpf}">
+                            123.456.789-00
+                          </dd>
+
+                          <dt class="col-sm-5 text-muted">
+                            <i class="bi bi-briefcase me-1"></i>Profissão:
+                          </dt>
+                          <dd
+                            class="col-sm-7"
+                            th:text="${pedido.cliente.profissao}"
+                          >
+                            Engenheiro
+                          </dd>
+
+                          <dt
+                            class="col-sm-5 text-muted"
+                            th:if="${pedido.status == 'APROVADO' && pedido.proprietarioCarro != null}"
+                          >
+                            <i class="bi bi-key me-1"></i>Proprietário:
+                          </dt>
+                          <dd
+                            class="col-sm-7 fw-bold"
+                            th:if="${pedido.status == 'APROVADO' && pedido.proprietarioCarro != null}"
+                            th:text="${pedido.proprietarioCarro}"
+                          >
+                            BANCO
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+
+                    <div
+                      class="card bg-light border-0 shadow-sm"
+                      th:if="${pedido.automovel != null}"
+                    >
+                      <div class="card-body">
+                        <h6 class="card-title text-primary mb-3">
+                          <i class="bi bi-car-front-fill me-1"></i>Informações
+                          do Automóvel
+                        </h6>
+                        <dl class="row mb-0">
+                          <dt class="col-sm-5 text-muted">
+                            <i class="bi bi-tag me-1"></i>Marca:
+                          </dt>
+                          <dd
+                            class="col-sm-7 fw-medium"
+                            th:text="${pedido.automovel.marca}"
+                          >
+                            Toyota
+                          </dd>
+
+                          <dt class="col-sm-5 text-muted">
+                            <i class="bi bi-car-front me-1"></i>Modelo:
+                          </dt>
+                          <dd
+                            class="col-sm-7"
+                            th:text="${pedido.automovel.modelo}"
+                          >
+                            Corolla
+                          </dd>
+
+                          <dt class="col-sm-5 text-muted">
+                            <i class="bi bi-sign-turn-right me-1"></i>Placa:
+                          </dt>
+                          <dd class="col-sm-7">
+                            <span
+                              class="badge bg-light text-dark border"
+                              th:text="${pedido.automovel.placa}"
+                            >
+                              ABC-1234
+                            </span>
+                          </dd>
+
+                          <dt class="col-sm-5 text-muted">
+                            <i class="bi bi-currency-dollar me-1"></i>Diária:
+                          </dt>
+                          <dd
+                            class="col-sm-7 fw-bold text-success"
+                            th:text="${'R$ ' + #numbers.formatDecimal(pedido.automovel.precoDiaria, 1, 'POINT', 2, 'COMMA')}"
+                          >
+                            R$ 150,00
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="card-footer border-top p-3"
+                th:if="${pedido.status == 'NOVO'}"
+              >
+                <div class="d-flex flex-column">
+                  <div class="mb-3">
+                    <form
+                      th:action="@{'/banco/pedidos/' + ${pedido.id} + '/aprovar'}"
+                      method="post"
+                      id="approvalForm"
+                      class="needs-validation"
+                      novalidate
+                    >
+                      <div class="card border-0 shadow-sm p-3 mb-3 bg-light">
+                        <h6 class="mb-3 text-primary">
+                          <i class="bi bi-gear-fill me-1"></i>Opções de
+                          Aprovação
+                        </h6>
+                        <div class="form-check mb-3">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            value="true"
+                            id="gerarContrato"
+                            name="gerarContrato"
+                            checked
+                          />
+                          <label class="form-check-label" for="gerarContrato">
+                            <i class="bi bi-file-earmark-text me-1"></i>
+                            Gerar contrato de crédito automaticamente
+                          </label>
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label text-primary">
+                            <i class="bi bi-person-fill-lock me-1"></i>
+                            Proprietário do carro:
+                          </label>
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="radio"
+                              name="proprietarioCarro"
+                              id="proprietarioBanco"
+                              value="BANCO"
+                              checked
+                            />
+                            <label
+                              class="form-check-label"
+                              for="proprietarioBanco"
+                            >
+                              <i class="bi bi-bank me-1"></i> Banco
+                            </label>
+                          </div>
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="radio"
+                              name="proprietarioCarro"
+                              id="proprietarioCliente"
+                              value="CLIENTE"
+                            />
+                            <label
+                              class="form-check-label"
+                              for="proprietarioCliente"
+                            >
+                              <i class="bi bi-person me-1"></i> Cliente
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="d-flex gap-2 justify-content-end">
+                        <button
+                          type="submit"
+                          class="btn btn-success"
+                          onclick="return confirm('Tem certeza que deseja APROVAR este pedido?')"
+                        >
+                          <i class="bi bi-check-circle me-1"></i> Aprovar Pedido
+                        </button>
+                        <a
+                          th:href="@{'/banco/pedidos/' + ${pedido.id} + '/recusar'}"
+                          class="btn btn-danger"
+                        >
+                          <i class="bi bi-x-circle me-1"></i> Recusar Pedido
+                        </a>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="card-footer border-top p-3"
+                th:if="${pedido.status == 'APROVADO'}"
+              >
+                <div
+                  class="alert mb-0"
+                  th:classappend="${pedido.contrato != null ? 'alert-success' : 'alert-warning'}"
+                >
+                  <div
+                    th:if="${pedido.contrato != null}"
+                    class="d-flex align-items-center justify-content-between"
+                  >
+                    <div>
+                      <strong
+                        ><i class="bi bi-check-circle-fill me-1"></i> Contrato
+                        de Crédito Gerado</strong
+                      >
+                      <p class="mb-0">
+                        Este pedido possui um contrato de crédito associado.
+                      </p>
+                    </div>
+                    <a
+                      th:href="@{'/banco/contratos/' + ${pedido.contrato.id}}"
+                      class="btn btn-outline-primary ms-3"
+                    >
+                      <i class="bi bi-file-text me-1"></i> Ver Contrato
+                    </a>
+                  </div>
+                  <div th:unless="${pedido.contrato != null}">
+                    <strong
+                      ><i class="bi bi-exclamation-triangle-fill me-1"></i> Sem
+                      Contrato de Crédito</strong
+                    >
+                    <p class="mb-0">
+                      Este pedido não possui um contrato de crédito associado.
+                      Você pode criar um manualmente.
+                    </p>
+                    <div class="mt-2">
+                      <a
+                        href="/banco/contratos/novo"
+                        class="btn btn-sm btn-primary"
+                      >
+                        <i class="bi bi-plus-circle me-1"></i> Criar Contrato
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <!-- Timeline do Pedido -->
+            <div class="card shadow-sm border-0 mb-4">
+              <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                  <i class="bi bi-clock-history me-2"></i>Status do Pedido
+                </h5>
+              </div>
+              <div class="card-body p-4">
+                <div class="timeline">
+                  <div class="timeline-item mb-3 pb-3 border-bottom">
+                    <div class="d-flex">
+                      <div
+                        class="timeline-icon bg-primary text-white rounded-circle p-2 me-3"
+                      >
+                        <i class="bi bi-plus-circle-fill"></i>
+                      </div>
+                      <div>
+                        <h6 class="mb-1">Pedido Criado</h6>
+                        <p class="small text-muted mb-0">
+                          <i class="bi bi-clock me-1"></i>
+                          <span
+                            th:text="${#dates.format(pedido.dataCriacao, 'dd/MM/yyyy HH:mm')}"
+                          >
+                            01/01/2023 14:30
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="timeline-item mb-3 pb-3 border-bottom"
+                    th:if="${pedido.status != 'NOVO'}"
+                  >
+                    <div class="d-flex">
+                      <div
+                        class="timeline-icon bg-info text-white rounded-circle p-2 me-3"
+                      >
+                        <i class="bi bi-hourglass-split"></i>
+                      </div>
+                      <div>
+                        <h6 class="mb-1">Em Análise</h6>
+                        <p class="small text-muted mb-0">
+                          O pedido entrou em análise pelo banco
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="timeline-item mb-3 pb-3 border-bottom"
+                    th:if="${pedido.status == 'APROVADO'}"
+                  >
+                    <div class="d-flex">
+                      <div
+                        class="timeline-icon bg-success text-white rounded-circle p-2 me-3"
+                      >
+                        <i class="bi bi-check-circle-fill"></i>
+                      </div>
+                      <div>
+                        <h6 class="mb-1">Pedido Aprovado</h6>
+                        <p class="small text-muted mb-0">
+                          O pedido foi aprovado
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="timeline-item"
+                    th:if="${pedido.status == 'RECUSADO'}"
+                  >
+                    <div class="d-flex">
+                      <div
+                        class="timeline-icon bg-danger text-white rounded-circle p-2 me-3"
+                      >
+                        <i class="bi bi-x-circle-fill"></i>
+                      </div>
+                      <div>
+                        <h6 class="mb-1">Pedido Recusado</h6>
+                        <p
+                          class="small text-muted mb-0"
+                          th:if="${pedido.motivoRecusa != null}"
+                        >
+                          Motivo:
+                          <span th:text="${pedido.motivoRecusa}"
+                            >Motivo da recusa</span
+                          >
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ações Rápidas -->
+            <div class="card shadow-sm border-0">
+              <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                  <i class="bi bi-lightning-charge me-2"></i>Ações Rápidas
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="d-grid gap-2">
+                  <a href="/banco/pedidos" class="btn btn-outline-primary">
+                    <i class="bi bi-list-check me-1"></i> Ver Todos os Pedidos
+                  </a>
+                  <a href="/banco/dashboard" class="btn btn-outline-secondary">
+                    <i class="bi bi-speedometer2 me-1"></i> Ir para Dashboard
+                  </a>
+                  <a
+                    th:if="${pedido.contrato != null}"
+                    th:href="@{'/banco/contratos/' + ${pedido.contrato.id}}"
+                    class="btn btn-outline-success"
+                  >
+                    <i class="bi bi-file-text me-1"></i> Ver Contrato
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

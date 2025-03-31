@@ -1,65 +1,104 @@
 package br.com.luizcaliza.services;
 
+import br.com.luizcaliza.model.Cliente;
+import br.com.luizcaliza.model.ContratoDeCredito;
+import br.com.luizcaliza.model.Pedido;
+import br.com.luizcaliza.model.Rendimento;
+import br.com.luizcaliza.model.Usuario;
+import br.com.luizcaliza.repositories.ClienteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import br.com.luizcaliza.model.Cliente;
-import br.com.luizcaliza.repositories.ClienteRepository;
+import java.util.List;
 
 @Service
-public class ClienteService extends UsuarioService<Cliente> {
+public class ClienteService {
 
-  public ClienteService(ClienteRepository repository) {
-    super(repository);
+  @Autowired
+  private ClienteRepository clienteRepository;
+
+  @Autowired
+  private UsuarioService usuarioService;
+
+  @Autowired
+  @Lazy
+  private RendimentoService rendimentoService;
+
+  @Autowired
+  @Lazy
+  private PedidoService pedidoService;
+
+  public Cliente salvar(Cliente cliente, Usuario usuario) {
+    usuario.setRole("CLIENTE");
+    Usuario usuarioSalvo = usuarioService.salvar(usuario);
+
+    cliente.setUsuario(usuarioSalvo);
+    return clienteRepository.save(cliente);
   }
 
-  // @Override
-  // public Cliente update(Long id, Cliente cliente) {
-  // return repository.findById(id).map(existingCliente -> {
+  public Cliente atualizar(Cliente cliente) {
+    return clienteRepository.save(cliente);
+  }
 
-  // if (cliente.getPassword() != null && !cliente.getPassword().isEmpty()) {
-  // existingCliente.setPassword(cliente.getPassword());
-  // }
+  public Cliente buscarPorId(Long id) {
+    return clienteRepository.findById(id).orElse(null);
+  }
 
-  // existingCliente.setNome(cliente.getNome());
-  // existingCliente.setRg(cliente.getRg());
-  // existingCliente.setCpf(cliente.getCpf());
-  // existingCliente.setProfissao(cliente.getProfissao());
-  // existingCliente.setEndereco(cliente.getEndereco());
-  // existingCliente.setRendimentos(cliente.getRendimentos());
+  public Cliente buscarPorCpf(String cpf) {
+    return clienteRepository.findByCpf(cpf);
+  }
 
-  // return repository.save(existingCliente);
-  // }).orElseThrow(() -> new RuntimeException("Cliente não encontrado com id: " +
-  // id));
-  // }
+  public List<Cliente> listarTodos() {
+    return clienteRepository.findAll();
+  }
 
-  public Cliente patch(Long id, Cliente cliente) {
-    return repository.findById(id).map(existingCliente -> {
+  public void adicionarRendimento(Cliente cliente, Rendimento rendimento) {
+    rendimento.setCliente(cliente);
+    rendimentoService.salvar(rendimento);
 
-      if (cliente.getNome() != null && !cliente.getNome().isEmpty()) {
-        existingCliente.setNome(cliente.getNome());
-      }
+    cliente.getRendimentos().add(rendimento);
+    clienteRepository.save(cliente);
+  }
 
-      if (cliente.getRg() != null && !cliente.getRg().isEmpty()) {
-        existingCliente.setRg(cliente.getRg());
-      }
+  public List<Rendimento> listarRendimentos(Long clienteId) {
+    Cliente cliente = buscarPorId(clienteId);
+    if (cliente != null) {
+      return cliente.getRendimentos();
+    }
+    return List.of();
+  }
 
-      if (cliente.getCpf() != null && !cliente.getCpf().isEmpty()) {
-        existingCliente.setCpf(cliente.getCpf());
-      }
+  public boolean criarPedido(Cliente cliente, Pedido pedido) {
+    pedido.setCliente(cliente);
+    pedidoService.salvar(pedido);
+    return true;
+  }
 
-      if (cliente.getProfissao() != null && !cliente.getProfissao().isEmpty()) {
-        existingCliente.setProfissao(cliente.getProfissao());
-      }
+  public List<Pedido> consultarPedidos(Long clienteId) {
+    return pedidoService.buscarPorClienteId(clienteId);
+  }
 
-      if (cliente.getEndereco() != null) {
-        existingCliente.setEndereco(cliente.getEndereco());
-      }
+  public boolean modificarPedido(Pedido pedido) {
+    if (pedido.getStatus().equals("NOVO")) {
+      pedidoService.atualizar(pedido);
+      return true;
+    }
+    return false;
+  }
 
-      if (cliente.getRendimentos() != null) {
-        existingCliente.setRendimentos(cliente.getRendimentos());
-      }
+  public boolean cancelarPedido(Pedido pedido) {
+    if (pedido.getStatus().equals("NOVO") || pedido.getStatus().equals("EM_ANALISE")) {
+      pedido.setStatus("CANCELADO");
+      pedidoService.atualizar(pedido);
+      return true;
+    }
+    return false;
+  }
 
-      return repository.save(existingCliente);
-    }).orElseThrow(() -> new RuntimeException("Cliente não encontrado com id: " + id));
+  public boolean associarContrato(Pedido pedido, ContratoDeCredito contrato) {
+    pedido.setContrato(contrato);
+    pedidoService.atualizar(pedido);
+    return true;
   }
 }

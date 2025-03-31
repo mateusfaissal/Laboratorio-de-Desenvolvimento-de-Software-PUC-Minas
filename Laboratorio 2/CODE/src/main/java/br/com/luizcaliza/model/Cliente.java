@@ -1,71 +1,81 @@
 package br.com.luizcaliza.model;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-
 @Entity
-public class Cliente extends Usuario {
-  private String nome;
-  private String cpf;
+@Table(name = "clientes")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Cliente {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(nullable = false)
   private String rg;
+
+  @Column(nullable = false)
+  private String cpf;
+
+  @Column(nullable = false)
+  private String nome;
+
+  @Column(nullable = false)
+  private String endereco;
+
   private String profissao;
 
   @OneToOne
-  private Endereco endereco;
+  @JoinColumn(name = "usuario_id")
+  private Usuario usuario;
 
-  @OneToMany
-  @JoinColumn(name = "cliente_id")
-  private List<Rendimento> rendimentos;
+  @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+  private List<Rendimento> rendimentos = new ArrayList<>();
 
-  public String getNome() {
-    return nome;
+  @OneToMany(mappedBy = "cliente")
+  private List<Pedido> pedidos = new ArrayList<>();
+
+  @OneToMany(mappedBy = "cliente")
+  private List<Automovel> automoveis = new ArrayList<>();
+
+  public boolean criarPedido(Pedido pedido) {
+    pedido.setCliente(this);
+    return this.pedidos.add(pedido);
   }
 
-  public void setNome(String nome) {
-    this.nome = nome;
+  public boolean consultarPedidos() {
+    return !this.pedidos.isEmpty();
   }
 
-  public String getCpf() {
-    return cpf;
+  public boolean modificarPedido(Pedido pedido) {
+    if (this.pedidos.contains(pedido)) {
+      // Lógica para modificar o pedido
+      return true;
+    }
+    return false;
   }
 
-  public void setCpf(String cpf) {
-    this.cpf = cpf;
+  public boolean cancelarPedido(Pedido pedido) {
+    if (this.pedidos.contains(pedido)) {
+      pedido.setStatus("CANCELADO");
+      return true;
+    }
+    return false;
   }
 
-  public String getRg() {
-    return rg;
-  }
-
-  public void setRg(String rg) {
-    this.rg = rg;
-  }
-
-  public String getProfissao() {
-    return profissao;
-  }
-
-  public void setProfissao(String profissao) {
-    this.profissao = profissao;
-  }
-
-  public Endereco getEndereco() {
-    return endereco;
-  }
-
-  public void setEndereco(Endereco endereco) {
-    this.endereco = endereco;
-  }
-
-  public List<Rendimento> getRendimentos() {
-    return rendimentos;
-  }
-
-  public void setRendimentos(List<Rendimento> rendimentos) {
-    this.rendimentos = rendimentos;
+  public boolean associarContrato(Pedido pedido, ContratoDeCredito contrato) {
+    if (this.pedidos.contains(pedido)) {
+      pedido.setContrato(contrato);
+      return true;
+    }
+    return false;
   }
 }

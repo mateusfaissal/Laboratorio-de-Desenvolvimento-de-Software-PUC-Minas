@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Recusar Pedido - Sistema de Financiamento de Automóveis</title>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="text-primary">
+            <i class="bi bi-x-circle"></i> Recusar Pedido
+          </h2>
+          <a href="/banco/pedidos" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Voltar para Pedidos
+          </a>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 offset-md-3">
+            <div class="card shadow-sm mb-4">
+              <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">
+                  <i class="bi bi-exclamation-triangle me-2"></i>Informações do
+                  Pedido
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="row mb-4">
+                  <div class="col-md-6">
+                    <p>
+                      <strong><i class="bi bi-person"></i> Cliente:</strong>
+                      <span th:text="${pedido.cliente.nome}"></span>
+                    </p>
+                    <p>
+                      <strong
+                        ><i class="bi bi-car-front"></i> Automóvel:</strong
+                      >
+                      <span th:text="${pedido.automovel.modelo}"></span>
+                    </p>
+                    <p>
+                      <strong
+                        ><i class="bi bi-calendar-range"></i> Duração:</strong
+                      >
+                      <span
+                        th:if="${pedido.dataInicio != null && pedido.dataFim != null}"
+                        th:text="${#dates.format(pedido.dataInicio, 'dd/MM/yyyy') + ' até ' + #dates.format(pedido.dataFim, 'dd/MM/yyyy')}"
+                      ></span>
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                    <p>
+                      <strong
+                        ><i class="bi bi-calendar-check"></i> Data de
+                        Início:</strong
+                      >
+                      <span
+                        th:text="${#dates.format(pedido.dataInicio, 'dd/MM/yyyy')}"
+                      ></span>
+                    </p>
+                    <p>
+                      <strong
+                        ><i class="bi bi-currency-dollar"></i> Valor
+                        Total:</strong
+                      >
+                      <span
+                        class="text-danger fw-bold"
+                        th:text="${'R$ ' + #numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA')}"
+                      ></span>
+                    </p>
+                  </div>
+                </div>
+
+                <form
+                  th:action="@{/banco/pedidos/{id}/recusar(id=${pedido.id})}"
+                  method="post"
+                >
+                  <div class="mb-3">
+                    <label for="motivoRecusa" class="form-label"
+                      ><i class="bi bi-chat-left-text"></i> Motivo da
+                      Recusa:</label
+                    >
+                    <textarea
+                      class="form-control"
+                      id="motivoRecusa"
+                      name="motivoRecusa"
+                      rows="3"
+                      required
+                    ></textarea>
+                    <div class="form-text">
+                      Explique o motivo da recusa deste pedido. Esta informação
+                      será visível ao cliente.
+                    </div>
+                  </div>
+
+                  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="/banco/pedidos" class="btn btn-secondary">
+                      <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                      <i class="bi bi-check-circle"></i> Confirmar Recusa
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

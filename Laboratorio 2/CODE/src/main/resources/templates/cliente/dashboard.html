@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Dashboard do Cliente - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h2 class="text-primary">
+                <i class="bi bi-person-circle me-2"></i>Dashboard do Cliente
+              </h2>
+              <div>
+                <a href="/cliente/pedidos" class="btn btn-primary me-2">
+                  <i class="bi bi-list-check"></i> Meus Pedidos
+                </a>
+                <a href="/cliente/pedidos/novo" class="btn btn-success">
+                  <i class="bi bi-plus-circle"></i> Novo Pedido
+                </a>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                  <div
+                    class="card-body position-relative"
+                    style="background: linear-gradient(45deg, #0062cc, #0069d9)"
+                  >
+                    <div
+                      class="position-absolute"
+                      style="top: 15px; right: 15px; opacity: 0.2"
+                    >
+                      <i
+                        class="bi bi-clipboard-data"
+                        style="font-size: 4rem"
+                      ></i>
+                    </div>
+                    <h5 class="card-title text-white">
+                      <i class="bi bi-clipboard-data me-2"></i>Meus Pedidos
+                    </h5>
+                    <p
+                      class="card-text display-4 text-white mb-0"
+                      th:text="${#lists.size(pedidos)}"
+                    >
+                      0
+                    </p>
+                    <div class="d-flex justify-content-end mt-3">
+                      <a href="/cliente/pedidos" class="btn btn-light btn-sm">
+                        <i class="bi bi-arrow-right"></i> Ver todos
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                  <div
+                    class="card-body position-relative"
+                    style="background: linear-gradient(45deg, #218838, #28a745)"
+                  >
+                    <div
+                      class="position-absolute"
+                      style="top: 15px; right: 15px; opacity: 0.2"
+                    >
+                      <i
+                        class="bi bi-check2-circle"
+                        style="font-size: 4rem"
+                      ></i>
+                    </div>
+                    <h5 class="card-title text-white">
+                      <i class="bi bi-check2-circle me-2"></i>Pedidos Aprovados
+                    </h5>
+                    <p
+                      class="card-text display-4 text-white mb-0"
+                      th:text="${#lists.size(pedidos.?[status == 'APROVADO'])}"
+                    >
+                      0
+                    </p>
+                    <div class="d-flex justify-content-end mt-3">
+                      <a
+                        href="/cliente/pedidos?status=APROVADO"
+                        class="btn btn-light btn-sm"
+                      >
+                        <i class="bi bi-arrow-right"></i> Ver aprovados
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                  <div
+                    class="card-body position-relative"
+                    style="background: linear-gradient(45deg, #e0a800, #ffc107)"
+                  >
+                    <div
+                      class="position-absolute"
+                      style="top: 15px; right: 15px; opacity: 0.2"
+                    >
+                      <i class="bi bi-car-front" style="font-size: 4rem"></i>
+                    </div>
+                    <h5 class="card-title">
+                      <i class="bi bi-car-front me-2"></i>Novo Pedido
+                    </h5>
+                    <p class="card-text">
+                      Solicite um novo aluguel de automóvel.
+                    </p>
+                    <div class="d-flex justify-content-end mt-3">
+                      <a
+                        href="/cliente/pedidos/novo"
+                        class="btn btn-dark btn-sm"
+                      >
+                        <i class="bi bi-plus-circle me-1"></i> Criar pedido
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mt-4">
+              <div class="col-md-8">
+                <div class="card shadow-sm border-0">
+                  <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                      <i class="bi bi-clock-history me-2"></i>Pedidos Recentes
+                    </h5>
+                  </div>
+                  <div class="card-body">
+                    <div
+                      th:if="${#lists.isEmpty(pedidos)}"
+                      class="alert alert-info"
+                    >
+                      <i class="bi bi-info-circle me-2"></i>
+                      Você ainda não possui pedidos.
+                      <a href="/cliente/pedidos/novo" class="alert-link">
+                        <i class="bi bi-plus-circle"></i> Criar um pedido </a
+                      >.
+                    </div>
+                    <div
+                      th:unless="${#lists.isEmpty(pedidos)}"
+                      class="table-responsive"
+                    >
+                      <table class="table table-striped table-hover">
+                        <thead class="table-light">
+                          <tr>
+                            <th>ID</th>
+                            <th>Data</th>
+                            <th>Automóvel</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr th:each="pedido : ${pedidos}">
+                            <td th:text="${pedido.id}">1</td>
+                            <td
+                              th:text="${#dates.format(pedido.dataCriacao, 'dd/MM/yyyy')}"
+                            >
+                              01/01/2023
+                            </td>
+                            <td>
+                              <i class="bi bi-car-front text-muted me-1"></i>
+                              <span
+                                th:text="${pedido.automovel != null ? pedido.automovel.marca + ' ' + pedido.automovel.modelo : 'N/A'}"
+                              >
+                                Toyota Corolla
+                              </span>
+                            </td>
+                            <td>
+                              <span
+                                th:class="'badge rounded-pill ' + 
+                                                              (${pedido.status == 'NOVO'} ? 'bg-secondary' : 
+                                                              (${pedido.status == 'EM_ANALISE'} ? 'bg-info' : 
+                                                              (${pedido.status == 'APROVADO'} ? 'bg-success' : 
+                                                              (${pedido.status == 'RECUSADO'} ? 'bg-danger' : 
+                                                              (${pedido.status == 'CANCELADO'} ? 'bg-warning' : 'bg-dark')))))"
+                                th:text="${pedido.status}"
+                                >NOVO</span
+                              >
+                            </td>
+                            <td>
+                              <div class="btn-group" role="group">
+                                <a
+                                  th:href="@{'/cliente/pedidos/' + ${pedido.id}}"
+                                  class="btn btn-sm btn-info"
+                                  title="Ver detalhes"
+                                >
+                                  <i class="bi bi-eye"></i>
+                                </a>
+                                <a
+                                  th:href="@{'/cliente/pedidos/' + ${pedido.id} + '/editar'}"
+                                  class="btn btn-sm btn-primary"
+                                  title="Editar pedido"
+                                >
+                                  <i class="bi bi-pencil"></i>
+                                </a>
+                                <a
+                                  th:if="${pedido.status == 'NOVO' || pedido.status == 'EM_ANALISE'}"
+                                  th:href="@{'/cliente/pedidos/' + ${pedido.id} + '/cancelar'}"
+                                  class="btn btn-sm btn-danger"
+                                  title="Cancelar pedido"
+                                >
+                                  <i class="bi bi-x-circle"></i>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                  <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                      <i class="bi bi-person-vcard me-2"></i>Meu Perfil
+                    </h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="text-center mb-3">
+                      <i
+                        class="bi bi-person-circle text-primary"
+                        style="font-size: 4rem"
+                      ></i>
+                      <h5 class="mt-2" th:text="${cliente.nome}">João Silva</h5>
+                    </div>
+                    <ul class="list-group list-group-flush mb-3">
+                      <li
+                        class="list-group-item d-flex justify-content-between align-items-center"
+                      >
+                        <span><i class="bi bi-person-badge me-2"></i>CPF</span>
+                        <span
+                          class="badge bg-primary rounded-pill"
+                          th:text="${cliente.cpf}"
+                          >123.456.789-00</span
+                        >
+                      </li>
+                      <li
+                        class="list-group-item d-flex justify-content-between align-items-center"
+                      >
+                        <span
+                          ><i class="bi bi-briefcase me-2"></i>Profissão</span
+                        >
+                        <span
+                          class="badge bg-primary rounded-pill"
+                          th:text="${cliente.profissao}"
+                          >Engenheiro</span
+                        >
+                      </li>
+                      <li
+                        class="list-group-item d-flex justify-content-between align-items-center"
+                      >
+                        <span
+                          ><i class="bi bi-cash-stack me-2"></i>Total de
+                          Rendimentos</span
+                        >
+                        <span
+                          class="badge bg-success rounded-pill"
+                          th:text="${#numbers.formatDecimal(#aggregates.sum(cliente.rendimentos.![valor]), 1, 'POINT', 2, 'COMMA') + ' R$'}"
+                          >6.500,00 R$</span
+                        >
+                      </li>
+                    </ul>
+                    <div class="d-grid gap-2">
+                      <a href="/cliente/perfil" class="btn btn-outline-primary">
+                        <i class="bi bi-pencil-square me-1"></i>Editar Perfil
+                      </a>
+                      <a
+                        href="/cliente/rendimentos"
+                        class="btn btn-outline-success"
+                      >
+                        <i class="bi bi-cash me-1"></i>Gerenciar Rendimentos
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Detalhes do Automóvel - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Detalhes do Automóvel</h2>
+          <a href="/banco/automoveis" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para Automóveis
+          </a>
+        </div>
+
+        <div class="row">
+          <div class="col-md-8">
+            <!-- Informações do Automóvel -->
+            <div class="card mb-4">
+              <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                  <span
+                    th:text="${automovel.marca + ' ' + automovel.modelo + ' (' + automovel.ano + ')'}"
+                    >Toyota Corolla (2022)</span
+                  >
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5>Informações Gerais</h5>
+                    <dl class="row">
+                      <dt class="col-sm-4">Marca:</dt>
+                      <dd class="col-sm-8" th:text="${automovel.marca}">
+                        Toyota
+                      </dd>
+
+                      <dt class="col-sm-4">Modelo:</dt>
+                      <dd class="col-sm-8" th:text="${automovel.modelo}">
+                        Corolla
+                      </dd>
+
+                      <dt class="col-sm-4">Ano:</dt>
+                      <dd class="col-sm-8" th:text="${automovel.ano}">2022</dd>
+
+                      <dt class="col-sm-4">Matrícula:</dt>
+                      <dd class="col-sm-8" th:text="${automovel.matricula}">
+                        X12345
+                      </dd>
+
+                      <dt class="col-sm-4">Placa:</dt>
+                      <dd class="col-sm-8" th:text="${automovel.placa}">
+                        ABC-1234
+                      </dd>
+                    </dl>
+                  </div>
+                  <div class="col-md-6">
+                    <h5>Informações Financeiras</h5>
+                    <dl class="row">
+                      <dt class="col-sm-6">Preço da Diária:</dt>
+                      <dd
+                        class="col-sm-6"
+                        th:text="${'R$ ' + #numbers.formatDecimal(automovel.precoDiaria, 1, 'POINT', 2, 'COMMA')}"
+                      >
+                        R$ 150,00
+                      </dd>
+
+                      <dt class="col-sm-6">Status:</dt>
+                      <dd class="col-sm-6">
+                        <span
+                          th:if="${!#lists.isEmpty(automovel.pedidos) && !#lists.isEmpty(automovel.pedidos.?[status == 'APROVADO'])}"
+                          class="badge bg-warning"
+                          >Em uso</span
+                        >
+                        <span
+                          th:if="${#lists.isEmpty(automovel.pedidos) || #lists.isEmpty(automovel.pedidos.?[status == 'APROVADO'])}"
+                          class="badge bg-success"
+                          >Disponível</span
+                        >
+                      </dd>
+
+                      <dt class="col-sm-6">Proprietário:</dt>
+                      <dd
+                        class="col-sm-6"
+                        th:text="${automovel.proprietario != null ? automovel.proprietario.username : 'Não definido'}"
+                      >
+                        admin
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <!-- Histórico de Pedidos -->
+            <div class="card mb-4">
+              <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Histórico de Pedidos</h5>
+              </div>
+              <div class="card-body">
+                <div
+                  th:if="${#lists.isEmpty(automovel.pedidos)}"
+                  class="alert alert-info"
+                >
+                  Este automóvel ainda não possui pedidos registrados.
+                </div>
+                <div
+                  th:unless="${#lists.isEmpty(automovel.pedidos)}"
+                  class="list-group"
+                >
+                  <a
+                    th:each="pedido : ${automovel.pedidos}"
+                    th:href="@{'/banco/pedidos/' + ${pedido.id}}"
+                    class="list-group-item list-group-item-action"
+                  >
+                    <div class="d-flex w-100 justify-content-between">
+                      <h6 class="mb-1" th:text="${'Pedido #' + pedido.id}">
+                        Pedido #1
+                      </h6>
+                      <small
+                        th:class="'badge ' + 
+                            (${pedido.status == 'NOVO'} ? 'bg-secondary' : 
+                            (${pedido.status == 'EM_ANALISE'} ? 'bg-info' : 
+                            (${pedido.status == 'APROVADO'} ? 'bg-success' : 
+                            (${pedido.status == 'RECUSADO'} ? 'bg-danger' : 
+                            (${pedido.status == 'CANCELADO'} ? 'bg-warning' : 'bg-dark')))))"
+                        th:text="${pedido.status}"
+                        >NOVO</small
+                      >
+                    </div>
+                    <p class="mb-1" th:text="${pedido.cliente.nome}">
+                      Nome do Cliente
+                    </p>
+                    <small
+                      th:text="${#dates.format(pedido.dataInicio, 'dd/MM/yyyy') + ' a ' + #dates.format(pedido.dataFim, 'dd/MM/yyyy')}"
+                      >01/01/2023 a 10/01/2023</small
+                    >
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

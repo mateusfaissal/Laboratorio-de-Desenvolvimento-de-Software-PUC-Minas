@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layout :: layout(~{::title}, ~{::main})}"
+>
+  <head>
+    <title>Novo Contrato - Sistema de Aluguel de Carros</title>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Novo Contrato de Crédito</h2>
+          <a href="/banco/contratos" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+          </a>
+        </div>
+
+        <!-- Mensagem de erro -->
+        <div
+          th:if="${param.erro}"
+          class="alert alert-danger alert-dismissible fade show mb-4"
+          role="alert"
+        >
+          <strong>Erro!</strong> Ocorreu um problema ao criar o contrato.
+          Verifique os dados e tente novamente.
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">Formulário de Contrato</h5>
+          </div>
+          <div class="card-body">
+            <form
+              th:action="@{/banco/contratos/salvar}"
+              method="post"
+              th:object="${contrato}"
+            >
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <h4>Informações do Contrato</h4>
+
+                  <div class="mb-3">
+                    <label for="valor" class="form-label">Valor (R$)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      class="form-control"
+                      id="valor"
+                      th:field="*{valor}"
+                      required
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="condicoes" class="form-label">Condições</label>
+                    <textarea
+                      class="form-control"
+                      id="condicoes"
+                      th:field="*{condicoes}"
+                      rows="5"
+                      required
+                    ></textarea>
+                    <small class="text-muted">
+                      Descreva as condições do contrato, taxas, prazos, etc.
+                    </small>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <h4>Informações Adicionais</h4>
+
+                  <div class="mb-3 form-check">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      id="ativo"
+                      th:field="*{ativo}"
+                    />
+                    <label class="form-check-label" for="ativo"
+                      >Marcar como ativo</label
+                    >
+                    <div class="form-text">
+                      Se marcado, o contrato será validado automaticamente após
+                      a criação.
+                    </div>
+                  </div>
+
+                  <div class="alert alert-info mt-4">
+                    <i class="bi bi-info-circle"></i> A data do contrato será
+                    preenchida automaticamente com a data atual.
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12">
+                  <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                      <i class="bi bi-check-circle"></i> Criar Contrato
+                    </button>
+                    <a href="/banco/contratos" class="btn btn-outline-secondary"
+                      >Cancelar</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
