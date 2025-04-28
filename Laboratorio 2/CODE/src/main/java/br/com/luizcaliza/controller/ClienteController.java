@@ -1,16 +1,5 @@
 package br.com.luizcaliza.controller;
 
-import br.com.luizcaliza.model.Automovel;
-import br.com.luizcaliza.model.Cliente;
-import br.com.luizcaliza.model.Pedido;
-import br.com.luizcaliza.model.Rendimento;
-import br.com.luizcaliza.model.Usuario;
-import br.com.luizcaliza.services.AutomovelService;
-import br.com.luizcaliza.services.ClienteService;
-import br.com.luizcaliza.services.PedidoService;
-import br.com.luizcaliza.services.RendimentoService;
-import br.com.luizcaliza.services.UsuarioService;
-
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -24,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -31,6 +21,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import br.com.luizcaliza.model.Automovel;
+import br.com.luizcaliza.model.Cliente;
+import br.com.luizcaliza.model.Pedido;
+import br.com.luizcaliza.model.Rendimento;
+import br.com.luizcaliza.model.Usuario;
+import br.com.luizcaliza.services.AutomovelService;
+import br.com.luizcaliza.services.ClienteService;
+import br.com.luizcaliza.services.PedidoService;
+import br.com.luizcaliza.services.RendimentoService;
+import br.com.luizcaliza.services.UsuarioService;
 
 @Controller
 @RequestMapping("/cliente")
@@ -247,6 +248,19 @@ public class ClienteController {
     Cliente cliente = usuario.getCliente();
 
     clienteService.adicionarRendimento(cliente, rendimento);
+
+    return "redirect:/cliente/rendimentos";
+  }
+
+  @DeleteMapping("/rendimentos/{id}/deletar")
+  public String deletarRendimento(@PathVariable("id") Long id, Principal principal) {
+    Usuario usuario = usuarioService.buscarPorUsername(principal.getName());
+    Cliente cliente = usuario.getCliente();
+
+    Rendimento rendimento = rendimentoService.buscarPorId(id);
+    if (rendimento != null && rendimento.getCliente().getId().equals(cliente.getId())) {
+      rendimentoService.deletar(id);
+    }
 
     return "redirect:/cliente/rendimentos";
   }

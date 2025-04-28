@@ -35,6 +35,10 @@ public class RendimentoService {
     return rendimentoRepository.findAll();
   }
 
+  public void deletar(Long id) {
+    rendimentoRepository.deleteById(id);
+  }
+
   public List<Rendimento> buscarPorClienteId(Long clienteId) {
     return rendimentoRepository.findByClienteId(clienteId);
   }
