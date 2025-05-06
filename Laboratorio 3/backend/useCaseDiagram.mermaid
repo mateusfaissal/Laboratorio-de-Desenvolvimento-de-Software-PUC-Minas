@@ -1,0 +1,82 @@
+graph TD
+    %% Actors
+    Admin((Administrador))
+    Aluno((Aluno))
+    Professor((Professor))
+    Empresa((Empresa Parceira))
+    
+    %% Main System
+    subgraph Sistema de Moeda Estudantil
+        %% Authentication use cases
+        Login[Realizar Login]
+        AlterarSenha[Alterar Senha]
+        
+        %% Professor use cases
+        EnviarMoedas[Enviar Moedas para Aluno]
+        ConsultarSaldo[Consultar Saldo de Moedas]
+        GerenciarTransferencias[Gerenciar Transferências]
+        
+        %% Aluno use cases
+        VisualizarSaldo[Visualizar Saldo de Moedas]
+        VisualizarExtrato[Visualizar Extrato]
+        ReceberMoedas[Receber Moedas]
+        ResgatarVantagem[Resgatar Vantagem]
+        VisualizarCupons[Visualizar Cupons]
+        UtilizarCupom[Utilizar Cupom]
+        
+        %% Empresa use cases
+        CadastrarVantagens[Cadastrar Vantagens]
+        GerenciarVantagens[Gerenciar Vantagens]
+        ValidarCupom[Validar Cupom]
+        ListarCuponsResgatados[Listar Cupons Resgatados]
+        
+        %% Admin use cases
+        GerenciarUsuarios[Gerenciar Usuários]
+        GerenciarCursos[Gerenciar Cursos]
+        GerenciarDepartamentos[Gerenciar Departamentos]
+        GerarRelatorios[Gerar Relatórios]
+        
+        %% Common use cases
+        VisualizarNotificacoes[Visualizar Notificações]
+    end
+    
+    %% Admin connections
+    Admin --> Login
+    Admin --> AlterarSenha
+    Admin --> GerenciarUsuarios
+    Admin --> GerenciarCursos
+    Admin --> GerenciarDepartamentos
+    Admin --> GerarRelatorios
+    
+    %% Professor connections
+    Professor --> Login
+    Professor --> AlterarSenha
+    Professor --> EnviarMoedas
+    Professor --> ConsultarSaldo
+    Professor --> GerenciarTransferencias
+    Professor --> VisualizarNotificacoes
+    
+    %% Aluno connections
+    Aluno --> Login
+    Aluno --> AlterarSenha
+    Aluno --> VisualizarSaldo
+    Aluno --> VisualizarExtrato
+    Aluno --> ReceberMoedas
+    Aluno --> ResgatarVantagem
+    Aluno --> VisualizarCupons
+    Aluno --> UtilizarCupom
+    Aluno --> VisualizarNotificacoes
+    
+    %% Empresa connections
+    Empresa --> Login
+    Empresa --> AlterarSenha
+    Empresa --> CadastrarVantagens
+    Empresa --> GerenciarVantagens
+    Empresa --> ValidarCupom
+    Empresa --> ListarCuponsResgatados
+    Empresa --> VisualizarNotificacoes
+    
+    %% Use case relationships
+    EnviarMoedas -->|triggers| ReceberMoedas
+    ResgatarVantagem -->|creates| VisualizarCupons
+    UtilizarCupom -->|requires| ValidarCupom

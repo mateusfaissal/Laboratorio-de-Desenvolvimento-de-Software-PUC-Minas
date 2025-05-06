@@ -1,0 +1,130 @@
+classDiagram
+    %% Base class
+    class Usuario {
+        +String id
+        +String nome
+        +String email
+        +String senha
+        +String cpf
+        +TipoUsuario tipo
+        +boolean isAluno()
+        +boolean isProfessor()
+        +boolean isEmpresa()
+    }
+    
+    %% Enum inside Usuario
+    class TipoUsuario {
+        <<enumeration>>
+        ALUNO
+        PROFESSOR
+        EMPRESA
+    }
+    
+    %% User subtypes
+    class Aluno {
+        +String rg
+        +String endereco
+        +Curso curso
+        +Double saldoMoedas
+    }
+    
+    class Professor {
+        +Departamento departamento
+        +Double saldoMoedas
+        +List~TransferenciaAluno~ transferencias
+    }
+    
+    class EmpresaParceira {
+        +String cnpj
+        +String descricao
+        +List~Vantagem~ vantagens
+    }
+    
+    %% Entity classes
+    class Curso {
+        +String id
+        +String nome
+        +String codigo
+        +Instituicao instituicao
+    }
+    
+    class Departamento {
+        +String id
+        +String nome
+        +String codigo
+        +Instituicao instituicao
+    }
+    
+    class Instituicao {
+        +String id
+        +String nome
+    }
+    
+    class Vantagem {
+        +String id
+        +String nome
+        +String descricao
+        +String fotoUrl
+        +Double custoMoedas
+        +EmpresaParceira empresa
+    }
+    
+    %% Transactions
+    class Transacao {
+        <<abstract>>
+        +String id
+        +LocalDateTime dataHora
+        +Double valor
+        +String descricao
+        +TipoTransacao tipo
+        +void prePersist()
+    }
+    
+    class TipoTransacao {
+        <<enumeration>>
+        TRANSFERENCIA
+        RESGATE
+    }
+    
+    class TransferenciaAluno {
+        +Professor professor
+        +Aluno aluno
+        +String motivoReconhecimento
+    }
+    
+    class ResgateCupom {
+        +Aluno aluno
+        +Vantagem vantagem
+        +String codigoGerado
+        +LocalDateTime dataResgate
+        +LocalDateTime dataUtilizacao
+        +Boolean utilizado
+        +String generateCode()
+    }
+    
+    class Notificacao {
+        +String id
+        +String titulo
+        +String conteudo
+        +LocalDateTime dataHora
+        +boolean lida
+        +String destinatarioId
+    }
+    
+    %% Inheritance relationships
+    Usuario <|-- Aluno
+    Usuario <|-- Professor
+    Usuario <|-- EmpresaParceira
+    Transacao <|-- TransferenciaAluno
+    Transacao <|-- ResgateCupom
+    
+    %% Associations
+    Aluno "many" --> "1" Curso
+    Professor "many" --> "1" Departamento
+    Curso "many" --> "1" Instituicao
+    Departamento "many" --> "1" Instituicao
+    EmpresaParceira "1" --> "many" Vantagem
+    Professor "1" --> "many" TransferenciaAluno
+    Aluno "1" --> "many" TransferenciaAluno
+    Aluno "1" --> "many" ResgateCupom
+    Vantagem "1" --> "many" ResgateCupom

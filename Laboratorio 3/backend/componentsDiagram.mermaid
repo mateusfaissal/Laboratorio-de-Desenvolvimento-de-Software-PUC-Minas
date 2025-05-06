@@ -1,0 +1,96 @@
+graph TD
+    %% Main components
+    Client[Client Browser/App]
+    API[REST API Layer]
+    Service[Service Layer]
+    Repository[Repository Layer]
+    Database[(PostgreSQL Database)]
+    Auth[Authentication/Security]
+    
+    %% Controllers
+    subgraph Controllers
+        AuthController[Auth Controller]
+        UsuarioController[Usuario Controller]
+        AlunoController[Aluno Controller]
+        ProfessorController[Professor Controller]
+        EmpresaController[Empresa Controller]
+        TransacaoController[Transacao Controller]
+        VantagemController[Vantagem Controller]
+        CursoController[Curso Controller]
+        DepartamentoController[Departamento Controller]
+        NotificacaoController[Notificacao Controller]
+    end
+    
+    %% Services
+    subgraph Services
+        AuthService[Auth Service]
+        UsuarioService[Usuario Service]
+        AlunoService[Aluno Service]
+        ProfessorService[Professor Service]
+        EmpresaService[Empresa Service]
+        TransacaoService[Transacao Service]
+        VantagemService[Vantagem Service]
+        CursoService[Curso Service]
+        DepartamentoService[Departamento Service]
+        NotificacaoService[Notificacao Service]
+    end
+    
+    %% Repositories
+    subgraph Repositories
+        UsuarioRepo[Usuario Repository]
+        AlunoRepo[Aluno Repository]
+        ProfessorRepo[Professor Repository]
+        EmpresaRepo[Empresa Repository]
+        TransacaoRepo[Transacao Repository]
+        ResgateCupomRepo[ResgateCupom Repository]
+        TransferenciaAlunoRepo[TransferenciaAluno Repository]
+        VantagemRepo[Vantagem Repository]
+        CursoRepo[Curso Repository]
+        DepartamentoRepo[Departamento Repository]
+        NotificacaoRepo[Notificacao Repository]
+    end
+    
+    %% Connections
+    Client --> API
+    API --> Controllers
+    Controllers --> Services
+    Services --> Repositories
+    Repositories --> Database
+    
+    %% Auth connections
+    Client --> Auth
+    Auth --> AuthController
+    Auth --> AuthService
+
+    %% Controller to Service connections
+    AuthController --> AuthService
+    UsuarioController --> UsuarioService
+    AlunoController --> AlunoService
+    ProfessorController --> ProfessorService
+    EmpresaController --> EmpresaService
+    TransacaoController --> TransacaoService
+    VantagemController --> VantagemService
+    CursoController --> CursoService
+    DepartamentoController --> DepartamentoService
+    NotificacaoController --> NotificacaoService
+    
+    %% Service to Repository connections
+    UsuarioService --> UsuarioRepo
+    AlunoService --> AlunoRepo
+    ProfessorService --> ProfessorRepo
+    EmpresaService --> EmpresaRepo
+    TransacaoService --> TransacaoRepo
+    TransacaoService --> ResgateCupomRepo
+    TransacaoService --> TransferenciaAlunoRepo
+    VantagemService --> VantagemRepo
+    CursoService --> CursoRepo
+    DepartamentoService --> DepartamentoRepo
+    NotificacaoService --> NotificacaoRepo
+    
+    %% Service cross-connections
+    TransacaoService --> AlunoService
+    TransacaoService --> ProfessorService
+    TransacaoService --> VantagemService
+    VantagemService --> EmpresaService
+    AlunoService --> CursoService
+    ProfessorService --> DepartamentoService
