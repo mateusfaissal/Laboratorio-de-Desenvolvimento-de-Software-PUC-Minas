@@ -59,7 +59,8 @@ public class SecurityConfig {
             // Todas as outras rotas requerem autenticação
             .anyRequest().authenticated())
         .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .headers(headers -> headers.frameOptions().sameOrigin()); // Necessário para o console H2
+        .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())); // Necessário para o
+                                                                                              // console H2
 
     // Adiciona o filtro JWT
     http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
