@@ -2,6 +2,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "MoedaEstudantilApplication",
+      "request": "launch",
+      "mainClass": "br.com.moeda_estudantil.MoedaEstudantilApplication",
+      "projectName": "moeda-estudantil"
+    },
+    {
+      "type": "java",
       "name": "LuizcalizaApplication",
       "request": "launch",
       "mainClass": "br.com.luizcaliza.LuizcalizaApplication",
