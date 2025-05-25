@@ -13,6 +13,9 @@ import { Dashboard as ProfessorDashboard } from './pages/professor/Dashboard'
 import { SendCoins } from './pages/professor/SendCoins'
 import { Statement } from './pages/professor/Statement'
 
+// Importando páginas de vantagens
+import { Vantagens } from './pages/Vantagens'
+
 function App() {
   return (
     <Router>
@@ -24,11 +27,15 @@ function App() {
 
             {/* Rotas do estudante */}
             <Route path="/student/dashboard" element={<StudentDashboard />} />
+            <Route path="/student/vantagens" element={<Vantagens />} />
 
             {/* Rotas do professor */}
             <Route path="/professor/dashboard" element={<ProfessorDashboard />} />
             <Route path="/professor/send-coins" element={<SendCoins />} />
             <Route path="/professor/statement" element={<Statement />} />
+
+            {/* Rotas da empresa parceira */}
+            <Route path="/empresa/vantagens" element={<Vantagens />} />
 
             {/* Redirecionar para login por padrão */}
             <Route path="/" element={<Login />} />
