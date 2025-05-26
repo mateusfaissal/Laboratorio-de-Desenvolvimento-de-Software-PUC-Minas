@@ -1,0 +1,66 @@
+sequenceDiagram
+    participant Aluno
+    participant EmpresaParceira
+    participant Frontend
+    participant AuthService
+    participant VantagemService
+    participant EmailService
+    participant Backend
+    participant Database
+
+    %% Fluxo de Cadastro de Vantagem
+    EmpresaParceira->>Frontend: Acessa /empresa/vantagens
+    Frontend->>AuthService: Verifica autenticação
+    AuthService->>Backend: Valida token
+    Backend-->>AuthService: Token válido
+    AuthService-->>Frontend: Usuário autenticado
+    Frontend-->>EmpresaParceira: Exibe formulário de cadastro
+
+    EmpresaParceira->>Frontend: Preenche dados da vantagem
+    Frontend->>VantagemService: cadastrarVantagem(dados)
+    VantagemService->>Backend: POST /api/vantagens
+    Backend->>Database: Insere vantagem
+    Database-->>Backend: Confirma inserção
+    Backend-->>VantagemService: Retorna vantagem criada
+    VantagemService-->>Frontend: Confirma cadastro
+    Frontend-->>EmpresaParceira: Exibe mensagem de sucesso
+
+    %% Fluxo de Listagem e Resgate de Vantagem
+    Aluno->>Frontend: Acessa /student/vantagens
+    Frontend->>AuthService: Verifica autenticação
+    AuthService->>Backend: Valida token
+    Backend-->>AuthService: Token válido
+    AuthService-->>Frontend: Usuário autenticado
+
+    Frontend->>VantagemService: listarVantagens()
+    VantagemService->>Backend: GET /api/vantagens
+    Backend->>Database: Consulta vantagens
+    Database-->>Backend: Retorna lista
+    Backend-->>VantagemService: Retorna vantagens
+    VantagemService-->>Frontend: Lista de vantagens
+    Frontend-->>Aluno: Exibe vantagens disponíveis
+
+    %% Fluxo de Resgate de Vantagem
+    Aluno->>Frontend: Clica em "Resgatar"
+    Frontend->>VantagemService: resgatarVantagem(id)
+    VantagemService->>Backend: POST /api/vantagens/resgate
+    Backend->>Database: Verifica saldo do aluno
+    Database-->>Backend: Retorna saldo
+    Backend->>Database: Atualiza saldo
+    Backend->>EmailService: Envia email com cupom
+    EmailService-->>Aluno: Email com código do cupom
+    EmailService-->>EmpresaParceira: Email com código para conferência
+    Backend-->>VantagemService: Confirma resgate
+    VantagemService-->>Frontend: Resgate confirmado
+    Frontend-->>Aluno: Exibe confirmação
+
+    %% Fluxo de Erro - Saldo Insuficiente
+    Note over Aluno,Frontend: Cenário Alternativo
+    Aluno->>Frontend: Tenta resgatar vantagem
+    Frontend->>VantagemService: resgatarVantagem(id)
+    VantagemService->>Backend: POST /api/vantagens/resgate
+    Backend->>Database: Verifica saldo do aluno
+    Database-->>Backend: Retorna saldo insuficiente
+    Backend-->>VantagemService: Erro: saldo insuficiente
+    VantagemService-->>Frontend: Erro no resgate
+    Frontend-->>Aluno: Exibe mensagem de saldo insuficiente 
