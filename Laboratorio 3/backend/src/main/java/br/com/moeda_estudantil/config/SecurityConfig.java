@@ -45,6 +45,8 @@ public class SecurityConfig {
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/alunos/cadastro").permitAll()
             .requestMatchers("/api/empresas/cadastro").permitAll()
+            .requestMatchers("/api/alunos/me").permitAll()
+            .requestMatchers("/api/transacoes/extrato").permitAll()
 
             // Rotas públicas para o Swagger UI
             .requestMatchers("/swagger-ui.html").permitAll()

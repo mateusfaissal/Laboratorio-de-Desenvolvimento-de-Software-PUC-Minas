@@ -4,7 +4,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'professor' | 'partner';
+  tipo: 'ALUNO' | 'PROFESSOR' | 'EMPRESA';
 }
 
 export interface AuthState {
@@ -25,7 +25,7 @@ export interface AuthProviderProps {
 
 export interface SignInCredentials {
   email: string;
-  password: string;
+  senha: string;
 }
 
 export interface Student {
@@ -62,7 +62,10 @@ export interface Transaction {
 }
 
 export interface SendCoinFormData {
-  student_id: string;
-  amount: number;
-  description: string;
+  aluno: {
+    id: string;
+  };
+  valor: number;
+  motivoReconhecimento: string;
+  tipo: 'TRANSFERENCIA';
 }

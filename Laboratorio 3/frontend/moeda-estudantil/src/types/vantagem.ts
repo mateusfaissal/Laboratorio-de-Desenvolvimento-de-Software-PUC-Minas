@@ -1,15 +1,15 @@
 export interface Vantagem {
   id?: string;
-  titulo: string;
+  nome: string;
   descricao: string;
-  custo: number;
-  foto: string;
+  custoMoedas: number;
+  fotoUrl?: string;
   empresaId: string;
 }
 
 export interface CadastroVantagemDTO {
-  titulo: string;
+  nome: string;
   descricao: string;
-  custo: number;
-  foto: string;
+  custoMoedas: number;
+  fotoUrl?: string;
 } 

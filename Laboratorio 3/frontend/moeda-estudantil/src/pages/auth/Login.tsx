@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '../../components/common/Input';
@@ -9,32 +9,38 @@ import logo from '../../assets/logo.png';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [senha, setSenha] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const { signIn } = useAuth();
+  const { signIn, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.tipo === 'PROFESSOR') {
+        navigate('/professor/dashboard');
+      } else if (user.tipo === 'ALUNO') {
+        navigate('/student/dashboard');
+      } else if (user.tipo === 'EMPRESA') {
+        navigate('/empresa/dashboard');
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
 
   async function handleSubmit(event: FormEvent): Promise<void> {
     event.preventDefault();
     setError('');
     
-    if (!email || !password) {
+    if (!email || !senha) {
       setError('Preencha todos os campos');
       return;
     }
 
     try {
       setIsLoading(true);
-      await signIn({ email, password });
-      
-      // Redireciona com base no papel do usuário
-      if (email === 'professor@teste.com') {
-        navigate('/professor/dashboard');
-      } else if (email === 'estudante@teste.com') {
-        navigate('/student/dashboard');
-      }
+      await signIn({ email, senha });
+      // O redirecionamento será feito automaticamente pelo useEffect
     } catch (err) {
       setError('Email ou senha incorretos. Tente novamente.');
     } finally {
@@ -62,6 +68,7 @@ export const Login: React.FC = () => {
               <p className="text-sm text-dark-gray-300 mt-1">
                 Professor: professor@teste.com<br />
                 Estudante: estudante@teste.com<br />
+                Empresa: empresa@teste.com<br />
                 Senha: 123456
               </p>
             </div>
@@ -99,17 +106,17 @@ export const Login: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-dark-gray-300">
+              <label htmlFor="senha" className="block text-sm font-medium text-dark-gray-300">
                 Senha
               </label>
               <div className="mt-1">
                 <input
-                  id="password"
-                  name="password"
+                  id="senha"
+                  name="senha"
                   type="password"
                   required
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  value={senha}
+                  onChange={e => setSenha(e.target.value)}
                   className="input-field"
                   placeholder="••••••"
                 />

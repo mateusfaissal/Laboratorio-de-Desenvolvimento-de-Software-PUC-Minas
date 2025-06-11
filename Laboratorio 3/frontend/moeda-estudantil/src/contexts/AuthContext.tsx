@@ -21,6 +21,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     async function loadStoredData(): Promise<void> {
       const { user, token } = authService.getStoredAuthData();
+      console.log('Dados carregados do storage:', { user, token }); // Debug
 
       if (user && token) {
         setData({
@@ -42,6 +43,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signIn = useCallback(async (credentials: SignInCredentials) => {
     const response = await authService.signIn(credentials);
+    console.log('Resposta do login:', response); // Debug
     
     authService.storeAuthData(response);
     

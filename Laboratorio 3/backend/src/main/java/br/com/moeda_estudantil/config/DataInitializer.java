@@ -25,6 +25,18 @@ public class DataInitializer {
   private DepartamentoRepository departamentoRepository;
 
   @Autowired
+  private CursoRepository cursoRepository;
+
+  @Autowired
+  private AlunoRepository alunoRepository;
+
+  @Autowired
+  private EmpresaParceiraRepository empresaParceiraRepository;
+
+  @Autowired
+  private VantagemRepository vantagemRepository;
+
+  @Autowired
   private PasswordEncoder passwordEncoder;
 
   /**
@@ -52,22 +64,57 @@ public class DataInitializer {
       departamento.setInstituicao(instituicao);
       departamento = departamentoRepository.save(departamento);
 
+      // Criar curso
+      Curso curso = new Curso();
+      curso.setNome("Ciência da Computação");
+      curso.setInstituicao(instituicao);
+      curso = cursoRepository.save(curso);
+
+      // Criar aluno
+      Aluno aluno = new Aluno();
+      aluno.setNome("João da Silva");
+      aluno.setEmail("joao@gmail.com");
+      aluno.setSenha(passwordEncoder.encode("123")); // Senha padrão
+      aluno.setCpf("123.456.789-00");
+      aluno.setRg("MG-12.345.678");
+      aluno.setEndereco("Rua do Aluno, 456");
+      aluno.setTipo(Usuario.TipoUsuario.ALUNO);
+      aluno.setCurso(curso);
+      aluno.setSaldoMoedas(1000.0); // Saldo inicial
+      aluno = alunoRepository.save(aluno);
+
+      // Criar empresa
+      EmpresaParceira empresa = new EmpresaParceira();
+      empresa.setNome("Empresa Exemplo");
+      empresa.setEmail("empresa@gmail.com");
+      empresa.setSenha(passwordEncoder.encode("123")); // Senha padrão
+      empresa.setCpf("321.654.987-00"); // CPF do responsável
+      empresa.setCnpj("12.345.678/0001-99");
+      empresa.setTipo(Usuario.TipoUsuario.EMPRESA);
+      empresa.setDescricao("Empresa parceira de exemplo.");
+      empresa = empresaParceiraRepository.save(empresa);
+
+      // Criar vantagem
+      Vantagem vantagem = new Vantagem();
+      vantagem.setNome("Desconto Restaurante");
+      vantagem.setDescricao("10% de desconto no restaurante universitário");
+      vantagem.setCustoMoedas(50.0);
+      vantagem.setEmpresa(empresa);
+      vantagemRepository.save(vantagem);
+
       // Criar professor administrador
-      Professor admin = new Professor();
-      admin.setNome("Admin do Sistema");
-      admin.setEmail("admin@example.com");
-      admin.setSenha(passwordEncoder.encode("admin123")); // Senha padrão
-      admin.setCpf("123.456.789-00");
-      admin.setTipo(Usuario.TipoUsuario.PROFESSOR);
-      admin.setDepartamento(departamento);
-      admin.setSaldoMoedas(1000.0); // Saldo inicial
-      professorRepository.save(admin);
+      Professor professor = new Professor();
+      professor.setNome("Aramuni");
+      professor.setEmail("aramuni@gmail.com");
+      professor.setSenha(passwordEncoder.encode("123")); // Senha padrão
+      professor.setCpf("987.654.321-00");
+      professor.setTipo(Usuario.TipoUsuario.PROFESSOR);
+      professor.setDepartamento(departamento);
+      professor.setSaldoMoedas(1000.0); // Saldo inicial
+      professorRepository.save(professor);
 
       System.out.println("==============================================");
       System.out.println("Dados iniciais criados com sucesso!");
-      System.out.println("Usuário de acesso:");
-      System.out.println("Email: admin@example.com");
-      System.out.println("Senha: admin123");
       System.out.println("==============================================");
     };
   }

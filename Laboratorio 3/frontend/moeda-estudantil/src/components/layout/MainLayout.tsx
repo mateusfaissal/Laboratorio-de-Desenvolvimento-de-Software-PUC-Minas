@@ -12,29 +12,42 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isProfessor = user?.role === 'professor';
+  const isAluno = user?.tipo === 'ALUNO';
+  const isProfessor = user?.tipo === 'PROFESSOR';
+  const isEmpresa = user?.tipo === 'EMPRESA';
 
   const handleSignOut = () => {
     signOut();
     navigate('/login');
   };
 
-  const menuItems = isProfessor
-    ? [
-        { path: '/professor/dashboard', label: 'Dashboard' },
-        { path: '/professor/send-coins', label: 'Enviar Moedas' },
-        { path: '/professor/statement', label: 'Extrato' },
-      ]
-    : [
-        { path: '/student/dashboard', label: 'Dashboard' },
-      ];
+  const menuItems = [
+    { path: '/', label: 'Início' },
+    ...(isAluno ? [
+      { path: '/student/dashboard', label: 'Dashboard' },
+      { path: '/student/my-advantages', label: 'Minhas Vantagens' },
+      { path: '/student/cupons', label: 'Meus Cupons' },
+    ] : []),
+    ...(isProfessor ? [
+      { path: '/professor/dashboard', label: 'Dashboard' },
+      { path: '/professor/send-coins', label: 'Enviar Moedas' },
+      { path: '/professor/statement', label: 'Extrato' },
+      { path: '/cadastro/aluno', label: 'Cadastro de Aluno' },
+      { path: '/cadastro/empresa', label: 'Cadastro de Empresa' },
+    ] : []),
+    ...(isEmpresa ? [
+      { path: '/empresa/dashboard', label: 'Dashboard' },
+      // { path: '/empresa/vantagens', label: 'Vantagens' },
+      // { path: '/empresa/validar-cupom', label: 'Validar Cupom' },
+    ] : []),
+  ];
 
   return (
     <div className="min-h-screen bg-dark-gray-900">
       {/* Sidebar */}
       <aside className="fixed top-0 left-0 h-full w-64 bg-dark-gray-800 border-r border-dark-gray-700">
         <div className="p-6">
-          <Link to={isProfessor ? "/professor/dashboard" : "/student/dashboard"}>
+          <Link to={isProfessor ? "/professor/dashboard" : isEmpresa ? "/empresa/dashboard" : "/student/dashboard"}>
             <img src={logo} alt="Moeda Estudantil" className="h-16 w-auto hover:opacity-90 transition-opacity" />
           </Link>
         </div>

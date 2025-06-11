@@ -37,6 +37,11 @@ public class AlunoService {
         .orElseThrow(() -> new RecursoNaoEncontradoException("Aluno não encontrado"));
   }
 
+  public Aluno buscarPorEmail(String email) {
+    return alunoRepository.findByEmail(email)
+        .orElseThrow(() -> new RecursoNaoEncontradoException("Aluno não encontrado"));
+  }
+
   @Transactional
   public Aluno cadastrar(Aluno aluno) {
     // Verificar se já existe aluno com o mesmo email, CPF ou RG

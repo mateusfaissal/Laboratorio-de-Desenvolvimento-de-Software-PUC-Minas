@@ -1,32 +1,42 @@
 import type { Vantagem, CadastroVantagemDTO } from '../types/vantagem';
-import { vantagemServiceMock } from './vantagemServiceMock';
+import api from './api';
+import { getStoredAuthData } from './auth';
 
-// Usando o serviço mock para desenvolvimento
-export const vantagemService = vantagemServiceMock;
-
-// Código da API real (comentado por enquanto)
-/*
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api'; // O axios já usa o baseURL, então só precisa do path relativo
 
 export const vantagemService = {
   cadastrarVantagem: async (vantagem: CadastroVantagemDTO): Promise<Vantagem> => {
-    const response = await axios.post(`${API_URL}/vantagens`, vantagem);
+    const { user } = getStoredAuthData();
+    if (!user) {
+      throw new Error('Usuário não autenticado');
+    }
+    
+    const response = await api.post(`${API_URL}/vantagens/empresa/${user.id}`, {
+      nome: vantagem.nome,
+      descricao: vantagem.descricao,
+      custoMoedas: vantagem.custoMoedas,
+      fotoUrl: vantagem.fotoUrl
+    });
     return response.data;
   },
 
   listarVantagens: async (): Promise<Vantagem[]> => {
-    const response = await axios.get(`${API_URL}/vantagens`);
+    const response = await api.get(`${API_URL}/vantagens`);
     return response.data;
   },
 
   obterVantagemPorId: async (id: string): Promise<Vantagem> => {
-    const response = await axios.get(`${API_URL}/vantagens/${id}`);
+    const response = await api.get(`${API_URL}/vantagens/${id}`);
     return response.data;
   },
 
   listarVantagensPorEmpresa: async (empresaId: string): Promise<Vantagem[]> => {
-    const response = await axios.get(`${API_URL}/vantagens/empresa/${empresaId}`);
+    const response = await api.get(`${API_URL}/vantagens/empresa/${empresaId}`);
+    return response.data;
+  },
+
+  resgatarVantagem: async (vantagemId: string): Promise<any> => {
+    const response = await api.post(`${API_URL}/vantagens/${vantagemId}/resgatar`);
     return response.data;
   }
-};
-*/ 
+}; 

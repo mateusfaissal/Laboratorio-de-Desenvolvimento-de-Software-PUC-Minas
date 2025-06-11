@@ -5,22 +5,17 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import br.com.moeda_estudantil.model.Aluno;
 import br.com.moeda_estudantil.service.AlunoService;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/alunos")
+@SecurityRequirement(name = "bearerAuth")
 public class AlunoController {
 
   private final AlunoService alunoService;
@@ -35,8 +30,14 @@ public class AlunoController {
     return ResponseEntity.ok(alunoService.listarTodos());
   }
 
+  @GetMapping("/me")
+  public ResponseEntity<Aluno> buscarMeusDados(Authentication authentication) {
+    String email = authentication.getName();
+    return ResponseEntity.ok(alunoService.buscarPorEmail(email));
+  }
+
   @GetMapping("/{id}")
-  @PreAuthorize("hasRole('PROFESSOR') or @securityService.isCurrentUser(#id)")
+  //@PreAuthorize("hasRole('PROFESSOR') or @securityService.isCurrentUser(#id)")
   public ResponseEntity<Aluno> buscarPorId(@PathVariable String id) {
     return ResponseEntity.ok(alunoService.buscarPorId(id));
   }

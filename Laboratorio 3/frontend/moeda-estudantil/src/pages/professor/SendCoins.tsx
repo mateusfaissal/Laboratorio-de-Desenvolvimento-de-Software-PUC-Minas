@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Card } from '../../components/common/Card';
-
-// Dados mockados
-const MOCK_STUDENTS = [
-  { id: '1', name: 'Maria Silva', email: 'maria.silva@aluno.com', course: 'Engenharia de Software' },
-  { id: '2', name: 'João Santos', email: 'joao.santos@aluno.com', course: 'Ciência da Computação' },
-  { id: '3', name: 'Ana Oliveira', email: 'ana.oliveira@aluno.com', course: 'Sistemas de Informação' },
-  { id: '4', name: 'Pedro Costa', email: 'pedro.costa@aluno.com', course: 'Engenharia de Software' },
-  { id: '5', name: 'Beatriz Lima', email: 'beatriz.lima@aluno.com', course: 'Ciência da Computação' },
-];
+import { getStudentList, sendCoins } from '../../services/professor';
+import type { Student } from '../../types';
 
 interface FormData {
   studentId: string;
@@ -25,20 +18,47 @@ export const SendCoins: React.FC = () => {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredStudents = MOCK_STUDENTS.filter(student =>
-    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.email.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    async function fetchStudents() {
+      try {
+        const data = await getStudentList();
+        setStudents(data);
+      } catch (err) {
+        setError('Erro ao carregar alunos.');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStudents();
+  }, []);
+
+  const filteredStudents = students.filter(student =>
+    (student.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (student.email?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simula o envio
-    setTimeout(() => {
+    setError('');
+    try {
+      await sendCoins({
+        aluno: {
+          id: formData.studentId
+        },
+        valor: formData.amount,
+        motivoReconhecimento: formData.description,
+        tipo: 'TRANSFERENCIA'
+      });
       setSuccess(true);
       setFormData({ studentId: '', amount: 0, description: '' });
       setTimeout(() => setSuccess(false), 3000);
-    }, 500);
+    } catch (err) {
+      setError('Erro ao enviar moedas.');
+    }
   };
 
   return (
@@ -63,21 +83,29 @@ export const SendCoins: React.FC = () => {
               />
 
               <div className="space-y-2 max-h-96 overflow-y-auto">
-                {filteredStudents.map((student) => (
-                  <div
-                    key={student.id}
-                    className={`p-4 rounded-lg cursor-pointer transition-colors duration-200 ${
-                      formData.studentId === student.id
-                        ? 'bg-coin-green-600 text-white'
-                        : 'bg-dark-gray-700 hover:bg-dark-gray-600'
-                    }`}
-                    onClick={() => setFormData({ ...formData, studentId: student.id })}
-                  >
-                    <p className="font-medium">{student.name}</p>
-                    <p className="text-sm opacity-80">{student.email}</p>
-                    <p className="text-sm opacity-80">{student.course}</p>
-                  </div>
-                ))}
+                {loading ? (
+                  <div className="text-dark-gray-400">Carregando alunos...</div>
+                ) : error ? (
+                  <div className="text-red-400">{error}</div>
+                ) : filteredStudents.length === 0 ? (
+                  <div className="text-dark-gray-400">Nenhum aluno encontrado.</div>
+                ) : (
+                  filteredStudents.map((student) => (
+                    <div
+                      key={student.id}
+                      className={`p-4 rounded-lg cursor-pointer transition-colors duration-200 ${
+                        formData.studentId === student.id
+                          ? 'bg-coin-green-600 text-white'
+                          : 'bg-dark-gray-700 hover:bg-dark-gray-600'
+                      }`}
+                      onClick={() => setFormData({ ...formData, studentId: student.id })}
+                    >
+                      <p className="font-medium">{student.name}</p>
+                      <p className="text-sm opacity-80">{student.email}</p>
+                      <p className="text-sm opacity-80">{student.course}</p>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </Card>
@@ -120,6 +148,11 @@ export const SendCoins: React.FC = () => {
                   <p className="text-coin-green-400 text-sm">
                     Moedas enviadas com sucesso!
                   </p>
+                </div>
+              )}
+              {error && !loading && (
+                <div className="rounded-lg bg-red-900/20 border border-red-500/50 p-4">
+                  <p className="text-red-400 text-sm">{error}</p>
                 </div>
               )}
 

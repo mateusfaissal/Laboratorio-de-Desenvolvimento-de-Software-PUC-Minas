@@ -39,6 +39,8 @@ public class JwtTokenProvider {
         .map(GrantedAuthority::getAuthority)
         .collect(Collectors.joining(","));
 
+    logger.debug("Gerando token para usuário: {} com authorities: {}", authentication.getName(), authorities);
+
     return Jwts.builder()
         .setSubject(authentication.getName())
         .claim(authoritiesKey, authorities)
@@ -58,13 +60,17 @@ public class JwtTokenProvider {
         .parseClaimsJws(token)
         .getBody();
 
-    Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get(authoritiesKey).toString().split(","))
+    String authorities = claims.get(authoritiesKey, String.class);
+    logger.debug("Extraindo authorities do token: {}", authorities);
+
+    Collection<? extends GrantedAuthority> grantedAuthorities = Arrays.stream(authorities.split(","))
         .map(SimpleGrantedAuthority::new)
         .collect(Collectors.toList());
 
-    User principal = new User(claims.getSubject(), "", authorities);
+    User principal = new User(claims.getSubject(), "", grantedAuthorities);
+    logger.debug("Usuário autenticado: {} com roles: {}", principal.getUsername(), grantedAuthorities);
 
-    return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    return new UsernamePasswordAuthenticationToken(principal, token, grantedAuthorities);
   }
 
   /**
@@ -72,12 +78,34 @@ public class JwtTokenProvider {
    */
   public boolean validateToken(String token) {
     try {
-      Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+      Claims claims = Jwts.parserBuilder()
+          .setSigningKey(getSigningKey())
+          .build()
+          .parseClaimsJws(token)
+          .getBody();
+
+      // Verificar se o token expirou
+      if (claims.getExpiration().before(new Date())) {
+        logger.error("Token expirado em: {}", claims.getExpiration());
+        return false;
+      }
+
+      // Verificar se o token tem as claims necessárias
+      if (!claims.containsKey(authoritiesKey)) {
+        logger.error("Token não contém a claim de authorities");
+        return false;
+      }
+
+      logger.debug("Token válido para usuário: {} com authorities: {}", 
+          claims.getSubject(), claims.get(authoritiesKey));
       return true;
+    } catch (ExpiredJwtException e) {
+      logger.error("Token expirado: {}", e.getMessage());
+      return false;
     } catch (JwtException | IllegalArgumentException e) {
-      logger.error("Invalid JWT token: {}", e.getMessage());
+      logger.error("Token inválido: {}", e.getMessage());
+      return false;
     }
-    return false;
   }
 
   /**
